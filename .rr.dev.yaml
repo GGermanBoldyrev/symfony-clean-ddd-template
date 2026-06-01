@@ -1,0 +1,48 @@
+version: "3"
+
+# =============================================================================
+# RoadRunner — DEVELOPMENT override
+# Переопределяет значения из .rr.yaml
+# =============================================================================
+
+include:
+    - .rr.yaml
+
+http:
+    pool:
+        # 1 воркер без прекэша — не нужен rr reset после изменения кода
+        debug: true
+        max_jobs: 0
+        supervisor:
+            max_worker_memory: 0
+            exec_ttl: 0s
+            idle_ttl: 0s
+            ttl: 0s
+            watch_tick: 1s
+
+logs:
+    mode: development
+    level: debug
+    encoding: console
+    output: [ "stdout" ]
+    err_output: [ "stderr" ]
+    channels:
+        http:
+            level: debug
+            encoding: console
+            output: [ "stdout" ]
+        server:
+            level: debug
+            encoding: console
+            output: [ "stdout" ]
+
+# Авто-перезагрузка воркеров при изменении файлов
+reload:
+    interval: 1s
+    patterns: [ ".php" ]
+    services:
+        http:
+            dirs: [ "." ]
+            recursive: true
+            ignore: [ "vendor", "var", "node_modules" ]
+            patterns: [ ".php", ".yaml", ".env" ]

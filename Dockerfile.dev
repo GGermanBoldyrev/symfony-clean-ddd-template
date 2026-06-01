@@ -1,0 +1,77 @@
+# =============================================================================
+# Dockerfile.dev — DEVELOPMENT ONLY
+# =============================================================================
+
+ARG PHP_VERSION=8.4
+ARG ALPINE_VERSION=3.23
+ARG ROADRUNNER_VERSION=2025.1.7
+ARG COMPOSER_VERSION=2
+
+# =============================================================================
+# Stage 1: RoadRunner binary
+# =============================================================================
+FROM ghcr.io/roadrunner-server/roadrunner:${ROADRUNNER_VERSION} AS roadrunner
+
+# =============================================================================
+# Stage 2: Composer
+# =============================================================================
+FROM composer:${COMPOSER_VERSION} AS composer
+
+# =============================================================================
+# Stage 3: Development image
+# =============================================================================
+FROM php:${PHP_VERSION}-cli-alpine${ALPINE_VERSION} AS development
+
+ARG APP_UID=1000
+ARG APP_GID=1000
+ARG TZ=UTC
+
+RUN cp "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
+
+RUN apk add --no-cache \
+        ca-certificates \
+        curl \
+        libpq \
+        icu-libs \
+        libzip \
+        tzdata \
+        git \
+        bash \
+        unzip \
+        make \
+    && cp /usr/share/zoneinfo/${TZ} /etc/localtime \
+    && echo "${TZ}" > /etc/timezone \
+    && apk del tzdata
+
+COPY --from=mlocati/php-extension-installer:latest /usr/bin/install-php-extensions /usr/local/bin/
+
+RUN install-php-extensions \
+        opcache \
+        pdo_pgsql \
+        intl \
+        zip \
+        bcmath \
+        pcntl \
+        sockets \
+        redis \
+        xdebug \
+    && rm /usr/local/bin/install-php-extensions
+
+COPY docker/php.ini.dev "$PHP_INI_DIR/conf.d/99-app.ini"
+
+COPY --from=composer /usr/bin/composer /usr/bin/composer
+COPY --from=roadrunner /usr/bin/rr /usr/local/bin/rr
+
+# UID/GID совпадают с хостом — нет проблем с правами при volume mount
+RUN addgroup -g ${APP_GID} app \
+    && adduser -u ${APP_UID} -G app -s /bin/sh -D app
+
+WORKDIR /app
+
+USER app
+
+EXPOSE 8080
+EXPOSE 2114
+
+ENTRYPOINT ["/usr/local/bin/rr"]
+CMD ["serve", "-c", ".rr.dev.yaml"]

@@ -1,0 +1,40 @@
+; =============================================================================
+; php.ini — DEVELOPMENT
+; =============================================================================
+
+[PHP]
+expose_php = Off
+memory_limit = 512M
+error_log = /dev/stderr
+log_errors = On
+display_errors = On
+display_startup_errors = On
+
+[opcache]
+opcache.enable = 1
+opcache.enable_cli = 1
+opcache.validate_timestamps = 1
+opcache.revalidate_freq = 0
+opcache.memory_consumption = 256
+opcache.interned_strings_buffer = 32
+opcache.max_accelerated_files = 20000
+opcache.save_comments = 1
+; JIT несовместим с Xdebug
+opcache.jit = 0
+
+[apcu]
+apc.enable_cli = 1
+apc.shm_size = 32M
+
+[xdebug]
+; xdebug.mode намеренно НЕ задан здесь.
+; Управляется через XDEBUG_MODE env (см. .env и docker-compose.dev.yaml).
+; Значения: off | debug | coverage | profile | trace
+; Пример включения отладки: XDEBUG_MODE=debug в .env или docker-compose override.
+xdebug.start_with_request = no
+xdebug.client_host = host.docker.internal
+xdebug.client_port = 9003
+xdebug.idekey = PHPSTORM
+xdebug.max_nesting_level = 512
+xdebug.var_display_max_depth = 10
+xdebug.log_level = 0

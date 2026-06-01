@@ -1,0 +1,35 @@
+# =============================================================================
+# docker-compose.prod.yml — PRODUCTION
+# Запуск: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# =============================================================================
+
+services:
+
+    app:
+        build:
+            dockerfile: Dockerfile
+        ports:
+            - "${APP_PORT:-8080}:8080"
+            - "127.0.0.1:${RR_STATUS_PORT:-2114}:2114"
+        deploy:
+            resources:
+                limits:
+                    cpus: "${APP_CPU_LIMIT:-2}"
+                    memory: "${APP_MEMORY_LIMIT:-512M}"
+
+    postgres:
+        deploy:
+            resources:
+                limits:
+                    memory: "${POSTGRES_MEMORY_LIMIT:-256M}"
+
+    redis:
+        deploy:
+            resources:
+                limits:
+                    memory: "${REDIS_MEMORY_LIMIT:-128M}"
+
+    # Mailpit только для dev
+    mailpit:
+        profiles:
+            - dev

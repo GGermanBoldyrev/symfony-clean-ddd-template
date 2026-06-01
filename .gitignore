@@ -1,10 +1,115 @@
-
-###> symfony/framework-bundle ###
-/.env.local
-/.env.local.php
-/.env.*.local
-/config/secrets/prod/prod.decrypt.private.php
-/public/bundles/
-/var/
+# -----------------------------------------------------------------------------
+# Symfony & PHP
+# -----------------------------------------------------------------------------
 /vendor/
-###< symfony/framework-bundle ###
+/var/
+/public/bundles/
+/public/build/
+/public/assets/
+
+# Файлы окружения (в git храним только .env и .env.dist)
+.env.local
+.env.*.local
+.env.test.local
+.env.dev.local
+
+# RoadRunner / FrankenPHP (локальные стейты)
+.rr.local.yaml
+/frankenphp/caddy/
+
+# -----------------------------------------------------------------------------
+# Кэши статического анализа и тестов
+# -----------------------------------------------------------------------------
+.phpunit.result.cache
+.phpunit.cache/
+coverage/
+html-coverage/
+.php-cs-fixer.cache
+phpstan-baseline.neon
+.phpcs-cache
+psalm.xml.cache
+infection.log
+
+# -----------------------------------------------------------------------------
+# Docker
+# -----------------------------------------------------------------------------
+docker/postgres/data/
+docker/mysql/data/
+docker/redis/data/
+docker/rabbitmq/data/
+
+# -----------------------------------------------------------------------------
+# Frontend
+# -----------------------------------------------------------------------------
+/node_modules/
+/.npm/
+/.pnpm-store/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.eslintcache
+.stylelintcache
+
+# -----------------------------------------------------------------------------
+# IDE, Редакторы и AI-помощники
+# -----------------------------------------------------------------------------
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.settings/
+.cursor/
+.windsurf/
+.copilot/
+ai-context/
+
+# -----------------------------------------------------------------------------
+# OS / Системные файлы
+# -----------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# -----------------------------------------------------------------------------
+# Логи, временные файлы и дампы
+# -----------------------------------------------------------------------------
+*.log
+*.cache
+*.tmp
+*.temp
+/tmp/
+*.sql.gz
+*.dump
+*.pcap
+
+# -----------------------------------------------------------------------------
+# Секреты и сертификаты
+# -----------------------------------------------------------------------------
+*.pem
+*.key
+*.crt
+*.csr
+*.p12
+*.pfx
+/config/secrets/prod/*.decrypt.private.php
+
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###
+
+###> phpstan/phpstan ###
+phpstan.neon
+###< phpstan/phpstan ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###

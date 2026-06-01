@@ -1,0 +1,72 @@
+version: "3"
+
+# =============================================================================
+# RoadRunner — PRODUCTION config
+# =============================================================================
+
+endure:
+    grace_period: 30s
+    log_level: error
+
+rpc:
+    listen: tcp://127.0.0.1:6001
+
+server:
+    command: "php public/index.php"
+    relay: pipes
+    env:
+        APP_RUNTIME: Runtime\RoadRunnerSymfonyNyholm\Runtime
+
+http:
+    address: "0.0.0.0:${RR_PORT:-8080}"
+    middleware: [ "gzip", "headers" ]
+    max_request_size: 64
+    access_logs: false
+
+    headers:
+        cors:
+            # В проде обязательно задать конкретный домен в .env
+            allowed_origin: "${CORS_ALLOW_ORIGIN:-*}"
+            allowed_headers: "*"
+            allowed_methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+            allow_credentials: true
+            max_age: 600
+
+    pool:
+        # 0 = число логических CPU
+        num_workers: ${RR_NUM_WORKERS:-0}
+        # Перезапуск воркера после N запросов — защита от утечек памяти PHP
+        max_jobs: ${RR_MAX_JOBS:-64}
+        max_queue_size: 0
+        allocate_timeout: 60s
+        reset_timeout: 60s
+        destroy_timeout: 60s
+        supervisor:
+            watch_tick: 5s
+            max_worker_memory: ${RR_MAX_WORKER_MEMORY:-256}
+            exec_ttl: ${RR_EXEC_TTL:-30s}
+            idle_ttl: 60s
+            ttl: 0s
+
+# GET /health?plugin=http — жив ли воркер
+# GET /ready?plugin=http  — свободен ли воркер (для k8s readiness probe)
+status:
+    address: "0.0.0.0:${RR_STATUS_PORT:-2114}"
+    unavailable_status_code: 503
+    check_timeout: 10s
+
+logs:
+    mode: ${RR_LOG_MODE:-production}
+    level: ${RR_LOG_LEVEL:-warn}
+    encoding: json
+    output: [ "stdout" ]
+    err_output: [ "stderr" ]
+    channels:
+        http:
+            level: ${RR_LOG_LEVEL:-warn}
+            encoding: json
+            output: [ "stdout" ]
+        server:
+            level: ${RR_LOG_LEVEL:-warn}
+            encoding: json
+            output: [ "stdout" ]

@@ -1,0 +1,33 @@
+# =============================================================================
+# docker-compose.dev.yaml — DEVELOPMENT
+# Запуск: docker compose -f docker-compose.yaml -f docker-compose.dev.yaml up
+# =============================================================================
+
+services:
+
+    app:
+        build:
+            dockerfile: Dockerfile.dev
+        environment:
+            APP_ENV: dev
+            APP_DEBUG: 1
+            XDEBUG_MODE: ${XDEBUG_MODE:-off}
+        ports:
+            - "${APP_PORT:-8080}:8080"
+            - "127.0.0.1:${RR_STATUS_PORT:-2114}:2114"
+        volumes:
+            - .:/app
+        restart: "no"
+
+    postgres:
+        ports:
+            - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+
+    redis:
+        ports:
+            - "127.0.0.1:${REDIS_PORT:-6379}:6379"
+
+    mailpit:
+        ports:
+            - "127.0.0.1:${MAILPIT_SMTP_PORT:-1025}:1025"
+            - "127.0.0.1:${MAILPIT_UI_PORT:-8025}:8025"

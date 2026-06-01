@@ -1,0 +1,49 @@
+includes:
+    - phar://phpstan.phar/conf/bleedingEdge.neon
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+    - vendor/phpstan/phpstan-symfony/extension.neon
+    - vendor/phpstan/phpstan-symfony/rules.neon
+    - vendor/phpstan/phpstan-doctrine/extension.neon
+    - vendor/phpstan/phpstan-doctrine/rules.neon
+
+parameters:
+    level: 9
+    paths:
+        - src/
+        - tests/
+
+    symfony:
+        containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
+
+    # Требуем, чтобы все правила ignoreErrors были актуальными
+    reportUnmatchedIgnoredErrors: true
+
+    # Проверки DDD и типизации
+    checkUninitializedProperties: true
+    checkImplicitMixed: true
+    checkExplicitMixed: true
+    checkBenevolentUnionTypes: true
+    checkTooWideReturnTypesInProtectedAndPublicMethods: true
+    checkMissingCallableSignature: true
+    reportAlwaysTrueInLastCondition: true
+    reportWrongPhpDocTypeInVarTag: true
+
+    exceptions:
+        check:
+            missingCheckedExceptionInThrows: false
+            tooWideThrowType: true
+
+    ignoreErrors:
+        # Разрешаем explicit mixed только в слое инфраструктуры, контроллерах и тестах
+        -
+            message: '#^Explicit use of "mixed" type is not allowed\.#'
+            paths:
+                - src/*/Infrastructure/*
+                - src/Controller/*
+                - tests/*
+
+        # Игнорируем неизбежные ошибки Symfony Container / Proxy
+        -
+            message: '#^Method .* has parameter .* with no value type specified in iterable type array\.#'
+            paths:
+                - src/*/Infrastructure/*

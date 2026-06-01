@@ -1,0 +1,24 @@
+; =============================================================================
+; php.ini — PRODUCTION
+; =============================================================================
+
+[PHP]
+expose_php = Off
+memory_limit = 256M
+error_log = /dev/stderr
+log_errors = On
+
+[opcache]
+opcache.enable = 1
+opcache.validate_timestamps = 0
+opcache.memory_consumption = 256
+opcache.interned_strings_buffer = 32
+opcache.max_accelerated_files = 20000
+opcache.save_comments = 1
+; JIT tracing — оптимален для долгоживущих воркеров RoadRunner
+opcache.jit = tracing
+opcache.jit_buffer_size = 128M
+
+[apcu]
+apc.enable_cli = 1
+apc.shm_size = 32M

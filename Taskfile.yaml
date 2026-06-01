@@ -1,0 +1,235 @@
+version: '3'
+
+vars:
+    DC: docker compose -f docker-compose.yaml -f docker-compose.dev.yaml
+    DC_PROD: docker compose -f docker-compose.yaml -f docker-compose.prod.yaml
+    PHP: '{{.DC}} exec app php'
+    COMPOSER: '{{.DC}} exec app composer'
+    CONSOLE: '{{.PHP}} bin/console'
+
+dotenv: [ '.env' ]
+
+tasks:
+
+    # ---------------------------------------------------------------------------
+    # DEFAULT — список задач
+    # ---------------------------------------------------------------------------
+    default:
+        desc: Show available tasks
+        silent: true
+        cmd: task --list
+
+    # ---------------------------------------------------------------------------
+    # SETUP
+    # ---------------------------------------------------------------------------
+    install:
+        desc: First time setup — copy .env, build image, install deps, run migrations
+        cmds:
+            -   task: build
+            -   task: up
+            -   task: composer:install
+            -   task: db:migrate
+
+    # ---------------------------------------------------------------------------
+    # DOCKER
+    # ---------------------------------------------------------------------------
+    build:
+        desc: Build dev image
+        cmd: '{{.DC}} build'
+
+    build:prod:
+        desc: Build production image
+        cmd: '{{.DC_PROD}} build'
+
+    up:
+        desc: Start dev containers (detached)
+        cmd: '{{.DC}} up -d'
+
+    down:
+        desc: Stop and remove dev containers
+        cmd: '{{.DC}} down'
+
+    down:volumes:
+        desc: Stop containers and remove volumes (DESTRUCTIVE — удалит данные БД)
+        prompt: This will delete all volumes including database data. Continue?
+        cmd: '{{.DC}} down -v'
+
+    restart:
+        desc: Restart dev containers
+        cmds:
+            -   task: down
+            -   task: up
+
+    ps:
+        desc: Show running containers
+        cmd: '{{.DC}} ps'
+
+    logs:
+        desc: Follow logs (all services). Usage — task logs or task logs -- postgres
+        cmd: '{{.DC}} logs -f {{.CLI_ARGS}}'
+
+    # ---------------------------------------------------------------------------
+    # APP / RoadRunner
+    # ---------------------------------------------------------------------------
+    rr:reset:
+        desc: Reload RoadRunner workers (without downtime)
+        cmd: '{{.DC}} exec app rr reset'
+
+    rr:workers:
+        desc: Show RoadRunner workers status
+        cmd: '{{.DC}} exec app rr workers'
+
+    shell:
+        desc: Open bash shell in app container
+        cmd: '{{.DC}} exec app bash'
+
+    # ---------------------------------------------------------------------------
+    # COMPOSER
+    # ---------------------------------------------------------------------------
+    composer:install:
+        desc: Install PHP dependencies
+        cmd: '{{.COMPOSER}} install'
+
+    composer:update:
+        desc: Update PHP dependencies
+        cmd: '{{.COMPOSER}} update'
+
+    composer:require:
+        desc: Add a package. Usage — task composer:require -- vendor/package
+        cmd: '{{.COMPOSER}} require {{.CLI_ARGS}}'
+
+    composer:require:dev:
+        desc: Add a dev package. Usage — task composer:require:dev -- vendor/package
+        cmd: '{{.COMPOSER}} require --dev {{.CLI_ARGS}}'
+
+    composer:dump:
+        desc: Regenerate autoloader
+        cmd: '{{.COMPOSER}} dump-autoload'
+
+    # ---------------------------------------------------------------------------
+    # SYMFONY CONSOLE
+    # ---------------------------------------------------------------------------
+    console:
+        desc: Run Symfony console command. Usage — task console -- cache:clear
+        cmd: '{{.CONSOLE}} {{.CLI_ARGS}}'
+
+    cache:clear:
+        desc: Clear Symfony cache
+        cmd: '{{.CONSOLE}} cache:clear'
+
+    cache:warmup:
+        desc: Warm up Symfony cache
+        cmd: '{{.CONSOLE}} cache:warmup'
+
+    # ---------------------------------------------------------------------------
+    # DATABASE
+    # ---------------------------------------------------------------------------
+    db:migrate:
+        desc: Run pending migrations
+        cmd: '{{.CONSOLE}} doctrine:migrations:migrate --no-interaction'
+
+    db:migrate:diff:
+        desc: Generate migration from entity changes
+        cmd: '{{.CONSOLE}} doctrine:migrations:diff'
+
+    db:migrate:status:
+        desc: Show migration status
+        cmd: '{{.CONSOLE}} doctrine:migrations:status'
+
+    db:migrate:rollback:
+        desc: Rollback last migration
+        cmd: '{{.CONSOLE}} doctrine:migrations:migrate prev --no-interaction'
+
+    db:schema:validate:
+        desc: Validate Doctrine schema vs database
+        cmd: '{{.CONSOLE}} doctrine:schema:validate'
+
+    db:fixtures:
+        desc: Load fixtures (dev only)
+        cmd: '{{.CONSOLE}} doctrine:fixtures:load --no-interaction'
+
+    db:psql:
+        desc: Open psql shell in postgres container
+        cmd: '{{.DC}} exec postgres psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}'
+
+    db:reset:
+        desc: Drop, recreate and migrate database (dev only)
+        cmds:
+            - '{{.CONSOLE}} doctrine:database:drop --force --if-exists'
+            - '{{.CONSOLE}} doctrine:database:create'
+            -   task: db:migrate
+
+    # ---------------------------------------------------------------------------
+    # TESTS
+    # ---------------------------------------------------------------------------
+    test:prepare:
+        desc: Create test database and build schema
+        cmds:
+            - '{{.CONSOLE}} doctrine:database:drop --force --env=test --if-exists'
+            - '{{.CONSOLE}} doctrine:database:create --env=test'
+            - '{{.CONSOLE}} doctrine:schema:update --force --env=test'
+
+    test:
+        desc: Run all tests
+        cmd: '{{.PHP}} bin/phpunit {{.CLI_ARGS}}'
+
+    test:unit:
+        desc: Run unit tests only (Domain & Application)
+        cmd: '{{.PHP}} bin/phpunit --testsuite=Unit {{.CLI_ARGS}}'
+
+    test:integration:
+        desc: Run integration tests only (Infrastructure)
+        cmd: '{{.PHP}} bin/phpunit --testsuite=Integration {{.CLI_ARGS}}'
+
+    test:functional:
+        desc: Run functional tests only (Controllers / API)
+        cmd: '{{.PHP}} bin/phpunit --testsuite=Functional {{.CLI_ARGS}}'
+
+    test:coverage:
+        desc: Run tests with coverage report (HTML)
+        cmd: '{{.PHP}} bin/phpunit --coverage-html var/coverage'
+
+    # ---------------------------------------------------------------------------
+    # CODE QUALITY
+    # ---------------------------------------------------------------------------
+    lint:
+        desc: Run all linters
+        cmds:
+            -   task: lint:cs
+            -   task: lint:stan
+
+    lint:cs:
+        desc: Check code style (PHP CS Fixer)
+        cmd: '{{.PHP}} vendor/bin/php-cs-fixer fix --dry-run --diff'
+
+    lint:cs:fix:
+        desc: Auto-fix code style
+        cmd: '{{.PHP}} vendor/bin/php-cs-fixer fix'
+
+    lint:stan:
+        desc: Run PHPStan static analysis
+        cmd: '{{.PHP}} vendor/bin/phpstan analyse'
+
+    # ---------------------------------------------------------------------------
+    # PROD HELPERS
+    # ---------------------------------------------------------------------------
+    prod:up:
+        desc: Start production containers
+        cmd: '{{.DC_PROD}} up -d'
+
+    prod:down:
+        desc: Stop production containers
+        cmd: '{{.DC_PROD}} down'
+
+    prod:logs:
+        desc: Follow production logs
+        cmd: '{{.DC_PROD}} logs -f {{.CLI_ARGS}}'
+
+    prod:deploy:
+        desc: Full production deploy — pull, build, migrate, reload workers
+        cmds:
+            - '{{.DC_PROD}} pull'
+            -   task: build:prod
+            - '{{.DC_PROD}} up -d --no-deps app'
+            - '{{.DC_PROD}} exec app php bin/console doctrine:migrations:migrate --no-interaction'
+            - '{{.DC_PROD}} exec app rr reset'
