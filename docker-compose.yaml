@@ -4,9 +4,14 @@
 # Prod: docker compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d
 # =============================================================================
 
+x-shared-config: &default-networks
+    networks:
+        - app
+
 services:
 
     app:
+        <<: *default-networks
         build:
             context: .
             args:
@@ -27,10 +32,9 @@ services:
             redis:
                 condition: service_healthy
         restart: unless-stopped
-        networks:
-            - app
 
     postgres:
+        <<: *default-networks
         image: postgres:18.4-alpine
         environment:
             POSTGRES_DB: ${POSTGRES_DB}
@@ -47,10 +51,9 @@ services:
             retries: 10
             start_period: 10s
         restart: unless-stopped
-        networks:
-            - app
 
     redis:
+        <<: *default-networks
         image: redis:8.6-alpine
         command: redis-server --appendonly yes
         volumes:
@@ -62,14 +65,11 @@ services:
             retries: 10
             start_period: 5s
         restart: unless-stopped
-        networks:
-            - app
 
     mailpit:
+        <<: *default-networks
         image: axllent/mailpit:latest
         restart: unless-stopped
-        networks:
-            - app
 
 networks:
     app:
