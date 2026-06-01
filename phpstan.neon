@@ -41,9 +41,26 @@ parameters:
                 - src/*/Infrastructure/*
                 - src/Controller/*
                 - tests/*
+            reportUnmatched: false
 
         # Игнорируем неизбежные ошибки Symfony Container / Proxy
         -
             message: '#^Method .* has parameter .* with no value type specified in iterable type array\.#'
             paths:
                 - src/*/Infrastructure/*
+            reportUnmatched: false
+
+        # ---------------------------------------------------------------------
+        # Игнорируем особенности Symfony Boilerplate (Kernel & Bootstrap)
+        # ---------------------------------------------------------------------
+        -
+            message: '#^Method App\\Kernel::getAllowedEnvs\(\) is unused\.#'
+            path: src/Kernel.php
+
+        -
+            message: '#^Call to function method_exists\(\) with .*Dotenv.* and .*bootEnv.* will always evaluate to true\.#'
+            path: tests/bootstrap.php
+
+        -
+            message: '#^Only booleans are allowed in an if condition, mixed given\.#'
+            path: tests/bootstrap.php
