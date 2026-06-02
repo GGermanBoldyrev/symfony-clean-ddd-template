@@ -233,3 +233,13 @@ tasks:
             - '{{.DC_PROD}} up -d --no-deps app'
             - '{{.DC_PROD}} exec app php bin/console doctrine:migrations:migrate --no-interaction'
             - '{{.DC_PROD}} exec app rr reset'
+
+    # ---------------------------------------------------------------------------
+    # CI / CD & QA PIPELINES
+    # ---------------------------------------------------------------------------
+    check:
+        desc: Full QA pipeline — fix style, run PHPStan, and run all tests
+        cmds:
+            - task: lint:cs:fix
+            - task: lint:stan
+            - task: test

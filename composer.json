@@ -25,7 +25,9 @@
         "phpstan/phpstan-strict-rules": "*",
         "phpstan/phpstan-symfony": "*",
         "phpunit/phpunit": "*",
-        "roave/security-advisories": "dev-latest"
+        "roave/security-advisories": "dev-latest",
+        "symfony/browser-kit": "8.1.*",
+        "symfony/http-client": "8.1.*"
     },
     "config": {
         "allow-plugins": {
