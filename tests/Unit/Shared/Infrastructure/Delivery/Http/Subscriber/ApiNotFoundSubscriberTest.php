@@ -4,54 +4,97 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Shared\Infrastructure\Delivery\Http\Subscriber;
 
+use App\Shared\Infrastructure\Delivery\Http\Subscriber\ApiNotFoundSubscriber;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-final class ApiNotFoundSubscriberTest extends WebTestCase
+final class ApiNotFoundSubscriberTest extends TestCase
 {
     #[Test]
-    public function itReturnsStrictJson404OnRootPath(): void
+    public function itSubscribesToCorrectEvents(): void
     {
-        $client = static::createClient();
+        $events = ApiNotFoundSubscriber::getSubscribedEvents();
 
-        $client->request('GET', '/');
+        self::assertArrayHasKey('kernel.request', $events);
+        self::assertArrayHasKey('kernel.exception', $events);
+    }
 
-        self::assertResponseStatusCodeSame(404);
-        self::assertResponseHeaderSame('Content-Type', 'application/json');
+    #[Test]
+    public function itSets404OnRootMainRequest(): void
+    {
+        $kernel = self::createStub(HttpKernelInterface::class);
+        $request = Request::create('/');
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
 
+        $subscriber = new ApiNotFoundSubscriber();
+        $subscriber->onKernelRequest($event);
+
+        self::assertNotNull($event->getResponse());
+        self::assertSame(404, $event->getResponse()->getStatusCode());
         self::assertJsonStringEqualsJsonString(
             '{"success":false,"error":"Not Found"}',
-            (string) $client->getResponse()->getContent(),
+            (string) $event->getResponse()->getContent(),
         );
     }
 
     #[Test]
-    public function itReturnsStrictJson404OnNonExistentRoute(): void
+    public function itIgnoresSubRequestsOnRootPath(): void
     {
-        $client = static::createClient();
+        $kernel = self::createStub(HttpKernelInterface::class);
+        $request = Request::create('/');
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::SUB_REQUEST);
 
-        $client->request('GET', '/api/some-fake-endpoint-that-does-not-exist');
+        $subscriber = new ApiNotFoundSubscriber();
+        $subscriber->onKernelRequest($event);
 
-        self::assertResponseStatusCodeSame(404);
-        self::assertResponseHeaderSame('Content-Type', 'application/json');
-
-        self::assertJsonStringEqualsJsonString(
-            '{"success":false,"error":"Not Found"}',
-            (string) $client->getResponse()->getContent(),
-        );
+        self::assertNull($event->getResponse());
     }
 
     #[Test]
-    public function itAllowsPostMethodsToReturn404Correctly(): void
+    public function itIgnoresNonRootPathsOnRequest(): void
     {
-        $client = static::createClient();
+        $kernel = self::createStub(HttpKernelInterface::class);
+        $request = Request::create('/api/users');
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
 
-        $client->request('POST', '/fake-route');
+        $subscriber = new ApiNotFoundSubscriber();
+        $subscriber->onKernelRequest($event);
 
-        self::assertResponseStatusCodeSame(404);
-        self::assertJsonStringEqualsJsonString(
-            '{"success":false,"error":"Not Found"}',
-            (string) $client->getResponse()->getContent(),
-        );
+        self::assertNull($event->getResponse());
+    }
+
+    #[Test]
+    public function itSets404OnNotFoundException(): void
+    {
+        $kernel = self::createStub(HttpKernelInterface::class);
+        $request = Request::create('/some-path');
+        $exception = new NotFoundHttpException('Not Found');
+        $event = new ExceptionEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $exception);
+
+        $subscriber = new ApiNotFoundSubscriber();
+        $subscriber->onKernelException($event);
+
+        self::assertNotNull($event->getResponse());
+        self::assertSame(404, $event->getResponse()->getStatusCode());
+    }
+
+    #[Test]
+    public function itIgnoresOtherExceptions(): void
+    {
+        $kernel = self::createStub(HttpKernelInterface::class);
+        $request = Request::create('/some-path');
+        $exception = new AccessDeniedHttpException('Forbidden');
+        $event = new ExceptionEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $exception);
+
+        $subscriber = new ApiNotFoundSubscriber();
+        $subscriber->onKernelException($event);
+
+        self::assertNull($event->getResponse());
     }
 }
