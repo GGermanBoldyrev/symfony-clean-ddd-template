@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Shared\Infrastructure\Delivery\Http\Cookie;
+namespace App\Identity\Infrastructure\Delivery\Http\Cookie;
 
 use Symfony\Component\HttpFoundation\Cookie;
 

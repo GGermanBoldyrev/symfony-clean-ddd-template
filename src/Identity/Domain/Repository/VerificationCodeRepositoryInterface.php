@@ -6,7 +6,7 @@ namespace App\Identity\Domain\Repository;
 
 use App\Identity\Domain\Entity\VerificationCode;
 use App\Identity\Domain\ValueObject\User\Email;
-use App\Identity\Domain\ValueObject\VerificationCodeId;
+use App\Identity\Domain\ValueObject\VerificationCode\VerificationCodeId;
 
 interface VerificationCodeRepositoryInterface
 {

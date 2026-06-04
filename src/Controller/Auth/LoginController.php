@@ -6,9 +6,9 @@ namespace App\Controller\Auth;
 
 use App\Identity\Application\Command\Login\LoginCommand;
 use App\Identity\Application\Dto\TokenPairDto;
-use App\Identity\Application\Port\TokenManagerInterface;
+use App\Identity\Application\Port\TokenManagerPort;
+use App\Identity\Infrastructure\Delivery\Http\Cookie\AuthCookieFactory;
 use App\Identity\Infrastructure\Delivery\Http\Request\Auth\LoginRequest;
-use App\Shared\Infrastructure\Delivery\Http\Cookie\AuthCookieFactory;
 use App\Shared\Infrastructure\Delivery\Http\Response\ApiResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -20,7 +20,7 @@ final readonly class LoginController
 {
     public function __construct(
         private MessageBusInterface $commandBus,
-        private TokenManagerInterface $tokens,  // TODO
+        private TokenManagerPort $tokens,
         private bool $secureCookies,
     ) {
     }

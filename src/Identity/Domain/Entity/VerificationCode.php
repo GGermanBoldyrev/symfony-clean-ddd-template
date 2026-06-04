@@ -13,8 +13,8 @@ use App\Identity\Domain\ValueObject\VerificationCode\AttemptCount;
 use App\Identity\Domain\ValueObject\VerificationCode\ExpiresAt;
 use App\Identity\Domain\ValueObject\VerificationCode\MaxAttempts;
 use App\Identity\Domain\ValueObject\VerificationCode\ResendAfter;
-use App\Identity\Domain\ValueObject\VerificationCodeId;
-use App\Identity\Domain\ValueObject\VerificationCodeValue;
+use App\Identity\Domain\ValueObject\VerificationCode\VerificationCodeId;
+use App\Identity\Domain\ValueObject\VerificationCode\VerificationCodeValue;
 use DateTimeImmutable;
 
 final class VerificationCode

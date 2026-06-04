@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Auth;
 
-use App\Shared\Infrastructure\Delivery\Http\Cookie\AuthCookieFactory;
+use App\Identity\Infrastructure\Delivery\Http\Cookie\AuthCookieFactory;
 use App\Shared\Infrastructure\Delivery\Http\Response\ApiResponse;
 use App\Shared\Infrastructure\Delivery\Http\Response\Enum\HttpSuccessCode;
 use Symfony\Component\Routing\Attribute\Route;
