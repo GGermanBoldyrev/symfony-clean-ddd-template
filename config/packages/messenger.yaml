@@ -1,0 +1,46 @@
+framework:
+    messenger:
+        default_bus: command.bus
+
+        failure_transport: failed
+
+        buses:
+            command.bus:
+                middleware:
+                    # Expired DB connections
+                    - doctrine_ping_connection
+                    # BEGIN - COMMIT/ROLLBACK transactions for all commands
+                    - doctrine_transaction
+
+            query.bus:
+                # Only for Read
+                default_middleware:
+                    enabled: true
+                    allow_no_handlers: false
+
+
+        transports:
+            # Async transport for complex tasks (email, video)
+            async:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    auto_setup: true
+                # Errors handling
+                retry_strategy:
+                    max_retries: 3
+                    delay: 1500
+                    multiplier: 2
+
+            failed: 'doctrine://default?queue_name=failed'
+
+            sync: 'sync://'
+
+            routing:
+            # 'App\Shared\Application\Message\AsyncMessageInterface': async
+
+when@test:
+    framework:
+        messenger:
+            transports:
+                async: 'in-memory://'
+                failed: 'in-memory://'

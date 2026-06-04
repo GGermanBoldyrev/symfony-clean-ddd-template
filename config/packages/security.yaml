@@ -1,0 +1,34 @@
+security:
+    password_hashers:
+        App\Identity\Infrastructure\Security\SecurityUser: 'auto'
+
+    providers:
+        identity_provider:
+            id: App\Identity\Infrastructure\Security\UserProvider
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        api:
+            pattern: ^/api/
+            stateless: true
+            provider: identity_provider
+            custom_authenticators:
+                - App\Identity\Infrastructure\Security\JwtAuthenticator
+
+    access_control:
+        # Unprotected routes
+        - { path: ^/api/v1/auth/(register|login|verify|refresh|logout), roles: PUBLIC_ACCESS }
+        # Protected routes
+        - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY }
+
+hen@test:
+    security:
+        password_hashers:
+            App\Identity\Infrastructure\Security\SecurityUser:
+                algorithm: auto
+                cost: 4
+                time_cost: 3
+                memory_cost: 10
