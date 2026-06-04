@@ -25,7 +25,7 @@ phpunit.xml
 .phpunit.cache/
 coverage/
 html-coverage/
-.php-cs-fixer.dist.php
+.php-cs-fixer.php
 .php-cs-fixer.cache
 phpstan-baseline.neon
 phpstan.dist.neon
