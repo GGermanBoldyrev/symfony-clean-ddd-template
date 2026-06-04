@@ -144,6 +144,10 @@ tasks:
         desc: Validate Doctrine schema vs database
         cmd: '{{.CONSOLE}} doctrine:schema:validate'
 
+    db:migration:generate:
+        desc: Create a blank migration file for manual SQL
+        cmd: '{{.CONSOLE}} doctrine:migrations:generate'
+
     db:fixtures:
         desc: Load fixtures (dev only)
         cmd: '{{.CONSOLE}} doctrine:fixtures:load --no-interaction'

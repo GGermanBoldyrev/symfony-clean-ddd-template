@@ -19,13 +19,45 @@ services:
                 APP_GID: ${APP_GID:-1000}
                 TZ: ${TZ:-UTC}
         environment:
+            # Symfony core
             APP_ENV: ${APP_ENV:-prod}
+            APP_DEBUG: ${APP_DEBUG:-0}
             APP_SECRET: ${APP_SECRET}
-            DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?serverVersion=18&charset=utf8
-            MAILER_DSN: smtp://mailpit:1025
-            REDIS_URL: redis://redis:6379
-            CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN:-*}
+            APP_SECURE_COOKIES: ${APP_SECURE_COOKIES:-true}
+            DEFAULT_URI: ${DEFAULT_URI:-http://localhost:8080}
             TZ: ${TZ:-UTC}
+
+            # Database URL
+            DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST:-postgres}:${POSTGRES_INTERNAL_PORT:-5432}/${POSTGRES_DB}?serverVersion=18&charset=utf8"
+
+            # Redis — URL
+            REDIS_URL: "redis://${REDIS_HOST:-redis}:${REDIS_INTERNAL_PORT:-6379}/${REDIS_CACHE_DB:-0}"
+            MESSENGER_TRANSPORT_DSN: "redis://${REDIS_HOST:-redis}:${REDIS_INTERNAL_PORT:-6379}/${REDIS_QUEUE_DB:-1}/messages"
+
+            # JWT
+            JWT_PRIVATE_KEY_PATH: ${JWT_PRIVATE_KEY_PATH:-/app/config/jwt/private.pem}
+            JWT_PUBLIC_KEY_PATH: ${JWT_PUBLIC_KEY_PATH:-/app/config/jwt/public.pem}
+            JWT_PASSPHRASE: ${JWT_PASSPHRASE}
+            JWT_ISSUER: ${JWT_ISSUER:-kinodom}
+            JWT_ACCESS_TOKEN_TTL: ${JWT_ACCESS_TOKEN_TTL:-900}
+            JWT_REFRESH_TOKEN_TTL: ${JWT_REFRESH_TOKEN_TTL:-2592000}
+
+            # Mailer — DSN
+            MAILER_DSN: "smtp://${MAILER_HOST:-mailpit}:${MAILER_PORT:-1025}"
+            MAILER_FROM_ADDRESS: ${MAILER_FROM_ADDRESS:-noreply@kinodom.ru}
+            MAILER_FROM_NAME: ${MAILER_FROM_NAME:-Kinodom}
+
+            # CORS
+            CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN:-*}
+
+            # RoadRunner
+            RR_NUM_WORKERS: ${RR_NUM_WORKERS:-0}
+            RR_MAX_JOBS: ${RR_MAX_JOBS:-64}
+            RR_MAX_WORKER_MEMORY: ${RR_MAX_WORKER_MEMORY:-256}
+            RR_EXEC_TTL: ${RR_EXEC_TTL:-30s}
+            RR_LOG_MODE: ${RR_LOG_MODE:-production}
+            RR_LOG_LEVEL: ${RR_LOG_LEVEL:-warn}
+
         depends_on:
             postgres:
                 condition: service_healthy
@@ -64,11 +96,6 @@ services:
             timeout: 3s
             retries: 10
             start_period: 5s
-        restart: unless-stopped
-
-    mailpit:
-        <<: *default-networks
-        image: axllent/mailpit:latest
         restart: unless-stopped
 
 networks:

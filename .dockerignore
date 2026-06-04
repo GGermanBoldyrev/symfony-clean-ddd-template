@@ -61,12 +61,12 @@ infection.json.dist
 # -----------------------------------------------------------------------------
 # Статический анализ и линтеры
 # -----------------------------------------------------------------------------
-phpstan.neon
+phpstan.dist.neon
 phpstan.neon.dist
 phpstan-baseline.neon
 psalm.xml
 psalm.xml.dist
-.php-cs-fixer.php
+.php-cs-fixer.dist.php
 .php-cs-fixer.cache
 .phpcs.xml
 phpcs.xml

@@ -1,23 +1,86 @@
-# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
-
-# This file is the entry point to configure your own services.
-# Files in the packages/ subdirectory configure your dependencies.
-# See also https://symfony.com/doc/current/service_container/import.html
-
-# Put parameters here that don't need to change on each machine where the app is deployed
-# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    app.secure_cookies: '%env(bool:APP_SECURE_COOKIES)%'
+    app.jwt.private_key_path: '%env(resolve:JWT_PRIVATE_KEY_PATH)%'
+    app.jwt.public_key_path: '%env(resolve:JWT_PUBLIC_KEY_PATH)%'
+    app.jwt.passphrase: '%env(JWT_PASSPHRASE)%'
+    app.jwt.issuer: '%env(JWT_ISSUER)%'
+    app.jwt.access_ttl: '%env(int:JWT_ACCESS_TOKEN_TTL)%'
+    app.jwt.refresh_ttl: '%env(int:JWT_REFRESH_TOKEN_TTL)%'
+    app.mailer.from_address: '%env(MAILER_FROM_ADDRESS)%'
+    app.mailer.from_name: '%env(MAILER_FROM_NAME)%'
 
 services:
-    # default configuration for services in *this* file
+    # -------------------------------------------------------------------------
+    # Default configuration for services in *this* file
+    # -------------------------------------------------------------------------
     _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        autowire: true
+        autoconfigure: true
+        public: false
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
+    # -------------------------------------------------------------------------
+    # Auto-register everything in src/
+    # -------------------------------------------------------------------------
     App\:
         resource: '../src/'
+        # TODO: проверить, запустится ли без exclude
+        exclude:
+            - '../src/Kernel.php'
+            - '../src/*/Domain/Entity/'
+            - '../src/*/Domain/ValueObject/'
+            - '../src/*/Domain/Exception/'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    # -------------------------------------------------------------------------
+    # Controllers
+    # -------------------------------------------------------------------------
+    App\Controller\:
+        resource: '../src/Controller/'
+        tags: ['controller.service_arguments']
+
+    # -------------------------------------------------------------------------
+    # Port - Adapter bindings
+    # -------------------------------------------------------------------------
+
+    # Password hashing
+    App\Identity\Application\Port\PasswordHasherPort:
+        class: App\Identity\Infrastructure\Security\SymfonyPasswordHasher
+
+    # JWT token management
+    App\Identity\Application\Port\TokenManagerPort:
+        class: App\Identity\Infrastructure\Security\JwtTokenManager
+        arguments:
+            $privateKeyPath: '%app.jwt.private_key_path%'
+            $publicKeyPath: '%app.jwt.public_key_path%'
+            $passphrase: '%app.jwt.passphrase%'
+            $issuer: '%app.jwt.issuer%'
+            $accessTokenTtlSeconds: '%app.jwt.access_ttl%'
+            $refreshTokenTtlSeconds: '%app.jwt.refresh_ttl%'
+
+    # Verification code generator
+    App\Identity\Application\Port\VerificationCodeGeneratorPort:
+        class: App\Identity\Infrastructure\Service\CryptoVerificationCodeGenerator
+
+    # Verification mailer
+    App\Identity\Application\Port\VerificationMailerPort:
+        class: App\Identity\Infrastructure\Mailer\SymfonyVerificationMailer
+        arguments:
+            $fromAddress: '%app.mailer.from_address%'
+            $fromName: '%app.mailer.from_name%'
+
+    # Repositories (Domain interface - Infrastructure implementation)
+    App\Identity\Domain\Repository\UserRepositoryInterface:
+        class: App\Identity\Infrastructure\Repository\DoctrineUserRepository
+
+    App\Identity\Domain\Repository\VerificationCodeRepositoryInterface:
+        class: App\Identity\Infrastructure\Repository\DoctrineVerificationCodeRepository
+
+    # -------------------------------------------------------------------------
+    # Controllers with scalar dependencies
+    # -------------------------------------------------------------------------
+    App\Controller\Auth\LoginController:
+        arguments:
+            $secureCookies: '%app.secure_cookies%'
+
+    App\Controller\Auth\RefreshController:
+        arguments:
+            $secureCookies: '%app.secure_cookies%'

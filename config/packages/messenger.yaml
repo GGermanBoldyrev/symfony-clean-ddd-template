@@ -1,22 +1,46 @@
 framework:
     messenger:
-        # Uncomment this (and the failed transport below) to send failed messages to this transport for later handling.
-        # failure_transport: failed
+        default_bus: command.bus
+
+        failure_transport: failed
+
+        buses:
+            command.bus:
+                middleware:
+                    # Expired DB connections
+                    - doctrine_ping_connection
+                    # BEGIN - COMMIT/ROLLBACK transactions for all commands
+                    - doctrine_transaction
+
+            query.bus:
+                # Only for Read
+                default_middleware:
+                    enabled: true
+                    allow_no_handlers: false
+
 
         transports:
-            # https://symfony.com/doc/current/messenger.html#transport-configuration
-            # async: '%env(MESSENGER_TRANSPORT_DSN)%'
-            # failed: 'doctrine://default?queue_name=failed'
+            # Async transport for complex tasks (email, video)
+            async:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    auto_setup: true
+                # Errors handling
+                retry_strategy:
+                    max_retries: 3
+                    delay: 1500
+                    multiplier: 2
+
+            failed: 'doctrine://default?queue_name=failed'
+
             sync: 'sync://'
 
-        routing:
-            # Route your messages to the transports
-            # 'App\Message\YourMessage': async
+            routing:
+            # 'App\Shared\Application\Message\AsyncMessageInterface': async
 
-# when@test:
-#    framework:
-#        messenger:
-#            transports:
-#                # replace with your transport name here (e.g., my_transport: 'in-memory://')
-#                # For more Messenger testing tools, see https://github.com/zenstruck/messenger-test
-#                async: 'in-memory://'
+when@test:
+    framework:
+        messenger:
+            transports:
+                async: 'in-memory://'
+                failed: 'in-memory://'

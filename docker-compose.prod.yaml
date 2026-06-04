@@ -28,8 +28,3 @@ services:
             resources:
                 limits:
                     memory: "${REDIS_MEMORY_LIMIT:-128M}"
-
-    # Mailpit только для dev
-    mailpit:
-        profiles:
-            - dev
