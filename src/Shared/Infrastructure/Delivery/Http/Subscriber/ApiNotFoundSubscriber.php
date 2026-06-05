@@ -6,26 +6,16 @@ namespace App\Shared\Infrastructure\Delivery\Http\Subscriber;
 
 use App\Shared\Infrastructure\Delivery\Http\Response\ApiResponse;
 use App\Shared\Infrastructure\Delivery\Http\Response\Enum\HttpErrorCode;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-final class ApiNotFoundSubscriber implements EventSubscriberInterface
+#[AsEventListener(event: KernelEvents::REQUEST, priority: 32)]
+#[AsEventListener(event: KernelEvents::EXCEPTION, priority: 0)]
+final class ApiNotFoundSubscriber
 {
-    /**
-     * @return array<string, string|array{0: string, 1: int}|list<array{0: string, 1?: int}>>
-     */
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            // События и их приоритет
-            KernelEvents::REQUEST => ['onKernelRequest', 32],
-            KernelEvents::EXCEPTION => ['onKernelException', 0],
-        ];
-    }
-
     public function onKernelRequest(RequestEvent $event): void
     {
         // Если основной запрос, а не внутренний редирект

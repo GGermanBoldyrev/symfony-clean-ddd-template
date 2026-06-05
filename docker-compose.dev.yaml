@@ -13,7 +13,6 @@ services:
             APP_DEBUG: 1
             APP_SECURE_COOKIES: "false"
             XDEBUG_MODE: ${XDEBUG_MODE:-off}
-            MAILER_DSN: "smtp://${MAILER_HOST:-mailpit}:${MAILER_PORT:-1025}"
         ports:
             - "${APP_PORT:-8080}:8080"
             - "127.0.0.1:${RR_STATUS_PORT:-2114}:2114"

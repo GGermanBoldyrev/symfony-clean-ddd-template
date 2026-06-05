@@ -24,7 +24,7 @@ security:
         # Protected routes
         - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY }
 
-hen@test:
+when@test:
     security:
         password_hashers:
             App\Identity\Infrastructure\Security\SecurityUser:

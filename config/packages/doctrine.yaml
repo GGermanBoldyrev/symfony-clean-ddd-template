@@ -3,7 +3,6 @@ doctrine:
         url: '%env(resolve:DATABASE_URL)%'
         server_version: '18' # Major version
         profiling_collect_backtrace: '%kernel.debug%'
-        use_savepoints: true # Inner transactions for postgres
 
     orm:
         auto_generate_proxy_classes: true
@@ -29,7 +28,6 @@ when@test:
     doctrine:
         dbal:
             dbname_suffix: '_test%env(default::TEST_TOKEN)%'
-            use_savepoints: true  # Inner transactions for postgres
 
 when@prod:
     doctrine:
