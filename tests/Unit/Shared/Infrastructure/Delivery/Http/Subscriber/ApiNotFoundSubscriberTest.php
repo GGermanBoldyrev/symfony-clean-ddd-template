@@ -7,6 +7,8 @@ namespace App\Tests\Unit\Shared\Infrastructure\Delivery\Http\Subscriber;
 use App\Shared\Infrastructure\Delivery\Http\Subscriber\ApiNotFoundSubscriber;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -17,12 +19,23 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 final class ApiNotFoundSubscriberTest extends TestCase
 {
     #[Test]
-    public function itSubscribesToCorrectEvents(): void
+    public function itHasCorrectEventListenerAttributes(): void
     {
-        $events = ApiNotFoundSubscriber::getSubscribedEvents();
+        $reflectionClass = new ReflectionClass(ApiNotFoundSubscriber::class);
+        $attributes = $reflectionClass->getAttributes(AsEventListener::class);
 
-        self::assertArrayHasKey('kernel.request', $events);
-        self::assertArrayHasKey('kernel.exception', $events);
+        self::assertCount(2, $attributes, 'ApiNotFoundSubscriber must have exactly 2 #[AsEventListener] attributes.');
+
+        $events = [];
+        foreach ($attributes as $attribute) {
+            $arguments = $attribute->getArguments();
+            if (isset($arguments['event'])) {
+                $events[] = $arguments['event'];
+            }
+        }
+
+        self::assertContains('kernel.request', $events);
+        self::assertContains('kernel.exception', $events);
     }
 
     #[Test]

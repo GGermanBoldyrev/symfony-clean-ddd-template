@@ -22,7 +22,7 @@ framework:
         transports:
             # Async transport for complex tasks (email, video)
             async:
-                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                dsn: '%env(default::MESSENGER_TRANSPORT_DSN)%'
                 options:
                     auto_setup: true
                 # Errors handling
