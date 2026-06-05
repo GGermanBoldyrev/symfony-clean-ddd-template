@@ -45,7 +45,7 @@ final readonly class RefreshController
         $pair = $envelope->last(HandledStamp::class)?->getResult();
 
         $response = ApiResponse::success([
-            'access_token' => $pair->accessToken,
+            'access_token' => $pair->accessToken->toString(),
         ]);
 
         $response->headers->setCookie(

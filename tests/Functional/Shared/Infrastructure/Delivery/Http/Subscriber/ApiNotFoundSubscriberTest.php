@@ -9,6 +9,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 final class ApiNotFoundSubscriberTest extends WebTestCase
 {
+    private const string NOT_FOUND_JSON = '{"success":false,"error":{"code":"route.not_found","message":"Not Found"}}';
+
     #[Test]
     public function itReturnsStrictJson404OnRootPath(): void
     {
@@ -20,7 +22,7 @@ final class ApiNotFoundSubscriberTest extends WebTestCase
         self::assertResponseHeaderSame('Content-Type', 'application/json');
 
         self::assertJsonStringEqualsJsonString(
-            '{"success":false,"error":"Not Found"}',
+            self::NOT_FOUND_JSON,
             (string) $client->getResponse()->getContent(),
         );
     }
@@ -36,7 +38,7 @@ final class ApiNotFoundSubscriberTest extends WebTestCase
         self::assertResponseHeaderSame('Content-Type', 'application/json');
 
         self::assertJsonStringEqualsJsonString(
-            '{"success":false,"error":"Not Found"}',
+            self::NOT_FOUND_JSON,
             (string) $client->getResponse()->getContent(),
         );
     }
@@ -50,7 +52,7 @@ final class ApiNotFoundSubscriberTest extends WebTestCase
 
         self::assertResponseStatusCodeSame(404);
         self::assertJsonStringEqualsJsonString(
-            '{"success":false,"error":"Not Found"}',
+            self::NOT_FOUND_JSON,
             (string) $client->getResponse()->getContent(),
         );
     }

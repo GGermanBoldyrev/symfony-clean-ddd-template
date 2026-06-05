@@ -30,7 +30,13 @@ final class JsonRequestParser
             throw BadRequestException::invalidJson();
         }
 
-        /** @var array<string, mixed> $data */
+        // stan lvl 9 is crazy
+        foreach ($data as $key => $value) {
+            if (!\is_string($key)) {
+                throw BadRequestException::invalidJson();
+            }
+        }
+
         return $data;
     }
 
