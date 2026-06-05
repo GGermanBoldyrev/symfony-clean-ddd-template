@@ -67,15 +67,14 @@ final class JwtAuthenticator extends AbstractAuthenticator
         Request $request,
         AuthenticationException $exception,
     ): Response {
-        $errorMessage = $exception->getMessageKey();
-
-        if ($exception instanceof CustomUserMessageAuthenticationException) {
-            $errorMessage = $exception->getMessage();
-        }
+        $message = $exception instanceof CustomUserMessageAuthenticationException
+            ? $exception->getMessage()
+            : $exception->getMessageKey();
 
         return ApiResponse::error(
-            status: HttpErrorCode::UNAUTHORIZED,
-            message: $errorMessage,
+            HttpErrorCode::UNAUTHORIZED,
+            'auth.unauthorized',
+            $message,
         );
     }
 }

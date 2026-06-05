@@ -34,7 +34,8 @@ final readonly class MeController
             'id' => $dto->id,
             'email' => $dto->email,
             'is_verified' => $dto->isVerified,
-            'data_policy' => $dto->dataPolicy,
+            'verified_at' => $dto->verifiedAt,
+            'data_policy_accepted_at' => $dto->dataPolicyAcceptedAt,
         ]);
     }
 }

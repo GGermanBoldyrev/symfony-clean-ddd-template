@@ -22,7 +22,7 @@ framework:
         transports:
             # Async transport for complex tasks (email, video)
             async:
-                dsn: '%env(default::MESSENGER_TRANSPORT_DSN)%'
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
                     auto_setup: true
                 # Errors handling
@@ -35,8 +35,8 @@ framework:
 
             sync: 'sync://'
 
-            routing:
-            # 'App\Shared\Application\Message\AsyncMessageInterface': async
+        routing:
+        # 'App\Shared\Application\Message\AsyncMessageInterface': async
 
 when@test:
     framework:

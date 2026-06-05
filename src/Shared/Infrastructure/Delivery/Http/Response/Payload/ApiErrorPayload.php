@@ -14,25 +14,29 @@ final readonly class ApiErrorPayload implements JsonSerializable
      */
     public function __construct(
         private HttpErrorCode $status,
+        private string $errorCode,
         private ?string $message = null,
         private ?array $details = null,
     ) {
     }
 
     /**
-     * @return array<string, bool|string|array<string, array<int, string>>>
+     * @return array<string, mixed>
      */
     public function jsonSerialize(): array
     {
-        $payload = [
-            'success' => false,
-            'error' => $this->message ?? $this->status->defaultMessage(),
+        $error = [
+            'code' => $this->errorCode,
+            'message' => $this->message ?? $this->status->defaultMessage(),
         ];
 
         if ($this->details !== null) {
-            $payload['details'] = $this->details;
+            $error['details'] = $this->details;
         }
 
-        return $payload;
+        return [
+            'success' => false,
+            'error' => $error,
+        ];
     }
 }

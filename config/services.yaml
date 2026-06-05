@@ -23,12 +23,12 @@ services:
     # -------------------------------------------------------------------------
     App\:
         resource: '../src/'
-        # TODO: проверить, запустится ли без exclude
         exclude:
             - '../src/Kernel.php'
             - '../src/*/Domain/Entity/'
             - '../src/*/Domain/ValueObject/'
             - '../src/*/Domain/Exception/'
+            - '../src/*/Infrastructure/Persistence/Doctrine/Entity/'
 
     # -------------------------------------------------------------------------
     # Controllers
@@ -69,10 +69,10 @@ services:
 
     # Repositories (Domain interface - Infrastructure implementation)
     App\Identity\Domain\Repository\UserRepositoryInterface:
-        class: App\Identity\Infrastructure\Repository\DoctrineUserRepository
+        class: App\Identity\Infrastructure\Persistence\Doctrine\Repository\DoctrineUserRepository
 
     App\Identity\Domain\Repository\VerificationCodeRepositoryInterface:
-        class: App\Identity\Infrastructure\Repository\DoctrineVerificationCodeRepository
+        class: App\Identity\Infrastructure\Persistence\Doctrine\Repository\DoctrineVerificationCodeRepository
 
     # -------------------------------------------------------------------------
     # Controllers with scalar dependencies

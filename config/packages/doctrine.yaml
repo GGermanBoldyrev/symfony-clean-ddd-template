@@ -5,24 +5,24 @@ doctrine:
         profiling_collect_backtrace: '%kernel.debug%'
 
     orm:
-        auto_generate_proxy_classes: true
-        enable_native_lazy_objects: true
-        validate_xml_mapping: true
-        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+        entity_managers:
+            default:
+                validate_xml_mapping: true
+                naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
 
-        identity_generation_preferences:
-            Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
+                identity_generation_preferences:
+                    Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
 
-        auto_mapping: true
+                auto_mapping: false
 
-        # DDD mapping
-        mappings:
-            Identity:
-                type: attribute
-                is_bundle: false
-                dir: '%kernel.project_dir%/src/Identity/Infrastructure/Persistence/Doctrine/Entity'
-                prefix: 'App\Identity\Infrastructure\Persistence\Doctrine\Entity'
-                alias: Identity
+                # DDD mapping
+                mappings:
+                    Identity:
+                        type: attribute
+                        is_bundle: false
+                        dir: '%kernel.project_dir%/src/Identity/Infrastructure/Persistence/Doctrine/Entity'
+                        prefix: 'App\Identity\Infrastructure\Persistence\Doctrine\Entity'
+                        alias: Identity
 
 when@test:
     doctrine:

@@ -32,6 +32,7 @@ final readonly class RefreshController
         if (!is_string($cookieValue) || $cookieValue === '') {
             return ApiResponse::error(
                 HttpErrorCode::UNAUTHORIZED,
+                'auth.refresh_token_missing',
                 'Refresh token cookie is missing.',
             );
         }

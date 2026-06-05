@@ -9,6 +9,8 @@ use App\Identity\Domain\Exception\DomainException;
 
 final class InvalidResendAfterException extends DomainException
 {
+    private const string ERROR_CODE = 'verification_code.invalid_resend_after';
+
     public static function notInFuture(): self
     {
         return new self('Resend-after date must be in the future.');
@@ -17,5 +19,10 @@ final class InvalidResendAfterException extends DomainException
     public static function afterExpiration(): self
     {
         return new self('Resend-after date must be before the expiration date.');
+    }
+
+    public function getErrorCode(): string
+    {
+        return self::ERROR_CODE;
     }
 }
