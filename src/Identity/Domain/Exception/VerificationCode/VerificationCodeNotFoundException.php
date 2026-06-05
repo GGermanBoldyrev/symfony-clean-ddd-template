@@ -13,7 +13,7 @@ final class VerificationCodeNotFoundException extends DomainException
     public static function forEmail(string $email): self
     {
         return new self(
-            sprintf('No active verification code found for "%s".', $email),
+            \sprintf('No active verification code found for "%s".', $email),
         );
     }
 

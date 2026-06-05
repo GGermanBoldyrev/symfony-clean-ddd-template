@@ -7,7 +7,6 @@ namespace App\Shared\Infrastructure\Delivery\Http\Request;
 use App\Shared\Infrastructure\Delivery\Http\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
 
-
 final class JsonRequestParser
 {
     /**
@@ -27,7 +26,7 @@ final class JsonRequestParser
 
         $data = json_decode($content, true);
 
-        if (!is_array($data)) {
+        if (!\is_array($data)) {
             throw BadRequestException::invalidJson();
         }
 
@@ -41,11 +40,11 @@ final class JsonRequestParser
      */
     public static function requireString(array $body, string $field): string
     {
-        if (!array_key_exists($field, $body)) {
+        if (!\array_key_exists($field, $body)) {
             throw BadRequestException::missingField($field);
         }
 
-        if (!is_string($body[$field])) {
+        if (!\is_string($body[$field])) {
             throw BadRequestException::wrongType($field, 'string');
         }
 
@@ -59,11 +58,11 @@ final class JsonRequestParser
      */
     public static function requireBool(array $body, string $field): bool
     {
-        if (!array_key_exists($field, $body)) {
+        if (!\array_key_exists($field, $body)) {
             throw BadRequestException::missingField($field);
         }
 
-        if (!is_bool($body[$field])) {
+        if (!\is_bool($body[$field])) {
             throw BadRequestException::wrongType($field, 'boolean');
         }
 

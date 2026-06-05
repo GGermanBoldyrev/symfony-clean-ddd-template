@@ -37,7 +37,7 @@ final class JwtAuthenticator extends AbstractAuthenticator
     public function authenticate(Request $request): Passport
     {
         $header = $request->headers->get('Authorization', '');
-        $raw = trim(substr($header, strlen(self::BEARER_PREFIX)));
+        $raw = trim(substr($header, \strlen(self::BEARER_PREFIX)));
 
         if ($raw === '') {
             throw new CustomUserMessageAuthenticationException('JWT token is missing.');

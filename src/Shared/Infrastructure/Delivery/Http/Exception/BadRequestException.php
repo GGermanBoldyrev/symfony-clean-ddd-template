@@ -6,7 +6,6 @@ namespace App\Shared\Infrastructure\Delivery\Http\Exception;
 
 use RuntimeException;
 
-
 final class BadRequestException extends RuntimeException
 {
     public static function emptyBody(): self
@@ -21,13 +20,13 @@ final class BadRequestException extends RuntimeException
 
     public static function missingField(string $field): self
     {
-        return new self(sprintf('Required field "%s" is missing.', $field));
+        return new self(\sprintf('Required field "%s" is missing.', $field));
     }
 
     public static function wrongType(string $field, string $expected): self
     {
         return new self(
-            sprintf('Field "%s" must be of type %s.', $field, $expected),
+            \sprintf('Field "%s" must be of type %s.', $field, $expected),
         );
     }
 }

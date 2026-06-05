@@ -90,7 +90,7 @@ final class JwtTokenManager implements TokenManagerPort
             ->issuedBy($this->issuer)
             ->relatedTo($userId->toString())
             ->issuedAt($now)
-            ->expiresAt($now->modify(sprintf('+%d seconds', $ttlSeconds)))
+            ->expiresAt($now->modify(\sprintf('+%d seconds', $ttlSeconds)))
             ->withClaim(self::CLAIM_TYPE, $type)
             ->getToken($this->config->signer(), $this->config->signingKey())
             ->toString();
@@ -117,7 +117,7 @@ final class JwtTokenManager implements TokenManagerPort
 
             $subject = $token->claims()->get('sub');
 
-            if (!is_string($subject)) {
+            if (!\is_string($subject)) {
                 return null;
             }
 

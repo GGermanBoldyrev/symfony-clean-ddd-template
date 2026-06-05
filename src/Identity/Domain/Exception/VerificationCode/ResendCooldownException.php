@@ -14,7 +14,7 @@ final class ResendCooldownException extends DomainException
     public static function before(DateTimeImmutable $resendAfter): self
     {
         return new self(
-            sprintf(
+            \sprintf(
                 'Code resend is not available until %s.',
                 $resendAfter->format('Y-m-d H:i:s'),
             ),

@@ -72,7 +72,7 @@ final readonly class RegisterCommandHandler
         $existing = $this->codes->findByEmail($email);
 
         if ($existing !== null) {
-            $existing->();
+            $existing->assertCanResend();
         }
 
         $code = $this->codeGenerator->generate();

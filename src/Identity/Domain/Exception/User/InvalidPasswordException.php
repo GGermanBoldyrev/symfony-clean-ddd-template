@@ -12,12 +12,12 @@ final class InvalidPasswordException extends DomainException
 
     public static function tooShort(int $min): self
     {
-        return new self(sprintf('Password must be at least %d characters long.', $min));
+        return new self(\sprintf('Password must be at least %d characters long.', $min));
     }
 
     public static function tooLong(int $max): self
     {
-        return new self(sprintf('Password must not exceed %d characters.', $max));
+        return new self(\sprintf('Password must not exceed %d characters.', $max));
     }
 
     public static function invalidHash(): self
@@ -30,4 +30,3 @@ final class InvalidPasswordException extends DomainException
         return self::ERROR_CODE;
     }
 }
-

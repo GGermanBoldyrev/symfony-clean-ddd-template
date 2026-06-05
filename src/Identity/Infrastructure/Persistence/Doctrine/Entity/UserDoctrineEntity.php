@@ -33,4 +33,3 @@ class UserDoctrineEntity
     #[ORM\Column(name: 'updated_at', type: 'datetimetz_immutable')]
     public DateTimeImmutable $updatedAt;
 }
-

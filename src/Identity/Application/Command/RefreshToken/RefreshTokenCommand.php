@@ -8,5 +8,6 @@ final readonly class RefreshTokenCommand
 {
     public function __construct(
         public string $refreshToken,
-    ) {}
+    ) {
+    }
 }

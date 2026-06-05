@@ -20,14 +20,14 @@ final class VerificationCodePolicy
     public static function expiresAt(DateTimeImmutable $now): ExpiresAt
     {
         return ExpiresAt::from(
-            $now->modify(sprintf('+%d seconds', self::TTL_SECONDS)),
+            $now->modify(\sprintf('+%d seconds', self::TTL_SECONDS)),
         );
     }
 
     public static function resendAfter(DateTimeImmutable $now, ExpiresAt $expiresAt): ResendAfter
     {
         return ResendAfter::from(
-            $now->modify(sprintf('+%d seconds', self::RESEND_COOLDOWN_SECONDS)),
+            $now->modify(\sprintf('+%d seconds', self::RESEND_COOLDOWN_SECONDS)),
             $expiresAt,
         );
     }

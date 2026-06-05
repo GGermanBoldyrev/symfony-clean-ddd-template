@@ -15,14 +15,14 @@ final class UuidGenerator
     {
         $timestampMs = (int) (microtime(true) * 1000);
 
-        $timeHex = str_pad(dechex($timestampMs), 12, '0', STR_PAD_LEFT);
+        $timeHex = str_pad(dechex($timestampMs), 12, '0', \STR_PAD_LEFT);
 
         $random = random_bytes(10);
 
-        $versionByte = (ord($random[0]) & 0x0F) | 0x70;
-        $variantByte = (ord($random[2]) & 0x3F) | 0x80;
+        $versionByte = (\ord($random[0]) & 0x0F) | 0x70;
+        $variantByte = (\ord($random[2]) & 0x3F) | 0x80;
 
-        return sprintf(
+        return \sprintf(
             '%s-%s-%s%s-%s%s-%s',
             substr($timeHex, 0, 8),
             substr($timeHex, 8, 4),

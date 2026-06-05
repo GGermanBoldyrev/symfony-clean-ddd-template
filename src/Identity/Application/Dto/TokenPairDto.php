@@ -10,7 +10,8 @@ use App\Identity\Domain\ValueObject\RefreshToken;
 final readonly class TokenPairDto
 {
     public function __construct(
-        public AccessToken  $accessToken,
+        public AccessToken $accessToken,
         public RefreshToken $refreshToken,
-    ) {}
+    ) {
+    }
 }

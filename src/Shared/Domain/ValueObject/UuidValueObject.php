@@ -14,7 +14,8 @@ abstract readonly class UuidValueObject implements Stringable
 {
     protected function __construct(
         protected string $value,
-    ) {}
+    ) {
+    }
 
     /**
      * Generates a new time-ordered UUID v7 for this identity type.

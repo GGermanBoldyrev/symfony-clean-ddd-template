@@ -13,7 +13,7 @@ final class InvalidAttemptCountException extends DomainException
     public static function negative(int $value): self
     {
         return new self(
-            sprintf('Attempt count cannot be negative, got %d.', $value),
+            \sprintf('Attempt count cannot be negative, got %d.', $value),
         );
     }
 

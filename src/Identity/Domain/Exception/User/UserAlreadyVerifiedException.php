@@ -13,7 +13,7 @@ final class UserAlreadyVerifiedException extends DomainException
 
     public function __construct(Email $email)
     {
-        parent::__construct(sprintf('User "%s" is already verified.', $email->toString()));
+        parent::__construct(\sprintf('User "%s" is already verified.', $email->toString()));
     }
 
     public function getErrorCode(): string

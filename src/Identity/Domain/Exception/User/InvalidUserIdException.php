@@ -12,7 +12,7 @@ final class InvalidUserIdException extends DomainException
 
     public static function invalidFormat(string $value): self
     {
-        return new self(sprintf('"%s" is not a valid UUID and cannot be used as UserId.', $value));
+        return new self(\sprintf('"%s" is not a valid UUID and cannot be used as UserId.', $value));
     }
 
     public function getErrorCode(): string

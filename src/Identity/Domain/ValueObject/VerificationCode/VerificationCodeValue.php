@@ -1,13 +1,11 @@
 <?php
 
-
 declare(strict_types=1);
 
 namespace App\Identity\Domain\ValueObject\VerificationCode;
 
 use App\Identity\Domain\Exception\VerificationCode\InvalidVerificationCodeValueException;
 use App\Shared\Domain\ValueObject\StringValueObject;
-
 
 final readonly class VerificationCodeValue extends StringValueObject
 {
