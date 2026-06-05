@@ -8,19 +8,25 @@ use App\Identity\Domain\Exception\DomainException;
 
 final class InvalidPasswordException extends DomainException
 {
+    private const string ERROR_CODE = 'user.invalid_password';
+
     public static function tooShort(int $min): self
     {
-        return new self(sprintf('Password must be at least %d characters long.', $min));
+        return new self(\sprintf('Password must be at least %d characters long.', $min));
     }
 
     public static function tooLong(int $max): self
     {
-        return new self(sprintf('Password must not exceed %d characters.', $max));
+        return new self(\sprintf('Password must not exceed %d characters.', $max));
     }
 
     public static function invalidHash(): self
     {
         return new self('The provided string is not a valid bcrypt hash.');
     }
-}
 
+    public function getErrorCode(): string
+    {
+        return self::ERROR_CODE;
+    }
+}

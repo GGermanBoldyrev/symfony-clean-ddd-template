@@ -9,6 +9,7 @@ use App\Identity\Domain\ValueObject\AccessToken;
 use App\Identity\Domain\ValueObject\RefreshToken;
 use App\Identity\Domain\ValueObject\User\UserId;
 use DateTimeImmutable;
+use InvalidArgumentException;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Signer\Ecdsa\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
@@ -36,6 +37,10 @@ final class JwtTokenManager implements TokenManagerPort
         private readonly int $accessTokenTtlSeconds,
         private readonly int $refreshTokenTtlSeconds,
     ) {
+        if ($this->privateKeyPath === '' || $this->publicKeyPath === '' || $this->issuer === '') {
+            throw new InvalidArgumentException('JWT configuration parameters cannot be empty');
+        }
+
         $this->config = Configuration::forAsymmetricSigner(
             new Sha256(),
             InMemory::file($this->privateKeyPath, $this->passphrase),
@@ -90,7 +95,7 @@ final class JwtTokenManager implements TokenManagerPort
             ->issuedBy($this->issuer)
             ->relatedTo($userId->toString())
             ->issuedAt($now)
-            ->expiresAt($now->modify(sprintf('+%d seconds', $ttlSeconds)))
+            ->expiresAt($now->modify(\sprintf('+%d seconds', $ttlSeconds)))
             ->withClaim(self::CLAIM_TYPE, $type)
             ->getToken($this->config->signer(), $this->config->signingKey())
             ->toString();
@@ -98,6 +103,10 @@ final class JwtTokenManager implements TokenManagerPort
 
     private function parseToken(string $raw, string $expectedType): ?UserId
     {
+        if ($raw === '') {
+            return null;
+        }
+
         try {
             $token = $this->config->parser()->parse($raw);
 
@@ -117,7 +126,7 @@ final class JwtTokenManager implements TokenManagerPort
 
             $subject = $token->claims()->get('sub');
 
-            if (!is_string($subject)) {
+            if (!\is_string($subject)) {
                 return null;
             }
 

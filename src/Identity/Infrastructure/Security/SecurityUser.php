@@ -4,25 +4,27 @@ declare(strict_types=1);
 
 namespace App\Identity\Infrastructure\Security;
 
+use App\Identity\Domain\ValueObject\User\HashedPassword;
+use App\Identity\Domain\ValueObject\User\UserId;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 final class SecurityUser implements UserInterface, PasswordAuthenticatedUserInterface
 {
     public function __construct(
-        private readonly string $userId,
-        private readonly string $passwordHash,
+        private readonly UserId $userId,
+        private readonly HashedPassword $passwordHash,
     ) {
     }
 
     public function getUserIdentifier(): string
     {
-        return $this->userId;
+        return $this->userId->toString();
     }
 
     public function getPassword(): string
     {
-        return $this->passwordHash;
+        return $this->passwordHash->toString();
     }
 
     /**

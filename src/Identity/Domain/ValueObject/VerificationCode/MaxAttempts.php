@@ -1,13 +1,11 @@
 <?php
 
-
 declare(strict_types=1);
 
 namespace App\Identity\Domain\ValueObject\VerificationCode;
 
 use App\Identity\Domain\Exception\VerificationCode\InvalidMaxAttemptsException;
 use App\Shared\Domain\ValueObject\IntValueObject;
-
 
 final readonly class MaxAttempts extends IntValueObject
 {

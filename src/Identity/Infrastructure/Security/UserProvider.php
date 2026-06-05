@@ -34,15 +34,15 @@ final class UserProvider implements UserProviderInterface
         }
 
         return new SecurityUser(
-            userId: $user->id->toString(),
-            passwordHash: $user->passwordHash->toString(),
+            userId: $user->id,
+            passwordHash: $user->passwordHash,
         );
     }
 
     public function refreshUser(UserInterface $user): SecurityUser
     {
         if (!$user instanceof SecurityUser) {
-            throw new UnsupportedUserException(sprintf('Expected %s, got %s.', SecurityUser::class, $user::class));
+            throw new UnsupportedUserException(\sprintf('Expected %s, got %s.', SecurityUser::class, $user::class));
         }
 
         // RoadRunner: stateless — reload from DB on every request.

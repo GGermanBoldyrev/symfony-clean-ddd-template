@@ -8,8 +8,6 @@ use App\Identity\Application\Port\VerificationCodeGeneratorPort;
 use App\Identity\Application\Port\VerificationMailerPort;
 use App\Identity\Domain\Entity\VerificationCode;
 use App\Identity\Domain\Exception\User\UserAlreadyVerifiedException;
-use App\Identity\Domain\Exception\VerificationCode\ResendCooldownException;
-use App\Identity\Domain\Exception\VerificationCode\ResendNotAllowedYetException;
 use App\Identity\Domain\Repository\UserRepositoryInterface;
 use App\Identity\Domain\Repository\VerificationCodeRepositoryInterface;
 use App\Identity\Domain\Service\VerificationCodePolicy;
@@ -45,11 +43,7 @@ final readonly class ResendVerificationCodeCommandHandler
         $existing = $this->codes->findByEmail($email);
 
         if ($existing !== null) {
-            try {
-                $existing->assertCanResend();
-            } catch (ResendNotAllowedYetException) {
-                throw new ResendCooldownException($existing->resendAfter->toDateTimeImmutable());
-            }
+            $existing->assertCanResend();
         }
 
         $now = new DateTimeImmutable();

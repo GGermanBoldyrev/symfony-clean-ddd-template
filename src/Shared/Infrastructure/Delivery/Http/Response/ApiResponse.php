@@ -27,9 +27,13 @@ final class ApiResponse extends JsonResponse
      */
     public static function error(
         HttpErrorCode $status = HttpErrorCode::BAD_REQUEST,
+        string $errorCode = 'internal.error',
         ?string $message = null,
         ?array $details = null,
     ): self {
-        return new self(new ApiErrorPayload($status, $message, $details), $status->value);
+        return new self(
+            new ApiErrorPayload($status, $errorCode, $message, $details),
+            $status->value,
+        );
     }
 }

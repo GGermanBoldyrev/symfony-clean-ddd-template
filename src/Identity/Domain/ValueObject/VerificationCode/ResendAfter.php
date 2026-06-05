@@ -1,6 +1,5 @@
 <?php
 
-
 declare(strict_types=1);
 
 namespace App\Identity\Domain\ValueObject\VerificationCode;
@@ -8,7 +7,6 @@ namespace App\Identity\Domain\ValueObject\VerificationCode;
 use App\Identity\Domain\Exception\VerificationCode\InvalidResendAfterException;
 use App\Shared\Domain\ValueObject\DateTimeValueObject;
 use DateTimeImmutable;
-
 
 final readonly class ResendAfter extends DateTimeValueObject
 {

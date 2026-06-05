@@ -29,9 +29,10 @@ final readonly class RefreshController
     {
         $cookieValue = $request->cookies->get(AuthCookieFactory::REFRESH_TOKEN_COOKIE);
 
-        if (!is_string($cookieValue) || $cookieValue === '') {
+        if (!\is_string($cookieValue) || $cookieValue === '') {
             return ApiResponse::error(
                 HttpErrorCode::UNAUTHORIZED,
+                'auth.refresh_token_missing',
                 'Refresh token cookie is missing.',
             );
         }
@@ -44,7 +45,7 @@ final readonly class RefreshController
         $pair = $envelope->last(HandledStamp::class)?->getResult();
 
         $response = ApiResponse::success([
-            'access_token' => $pair->accessToken,
+            'access_token' => $pair->accessToken->toString(),
         ]);
 
         $response->headers->setCookie(

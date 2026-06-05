@@ -27,7 +27,7 @@ final class JwtAuthenticator extends AbstractAuthenticator
     ) {
     }
 
-    public function supports(Request $request): ?bool
+    public function supports(Request $request): bool
     {
         $header = $request->headers->get('Authorization', '');
 
@@ -37,7 +37,7 @@ final class JwtAuthenticator extends AbstractAuthenticator
     public function authenticate(Request $request): Passport
     {
         $header = $request->headers->get('Authorization', '');
-        $raw = trim(substr($header, strlen(self::BEARER_PREFIX)));
+        $raw = trim(substr($header, \strlen(self::BEARER_PREFIX)));
 
         if ($raw === '') {
             throw new CustomUserMessageAuthenticationException('JWT token is missing.');
@@ -67,15 +67,14 @@ final class JwtAuthenticator extends AbstractAuthenticator
         Request $request,
         AuthenticationException $exception,
     ): Response {
-        $errorMessage = $exception->getMessageKey();
-
-        if ($exception instanceof CustomUserMessageAuthenticationException) {
-            $errorMessage = $exception->getMessage();
-        }
+        $message = $exception instanceof CustomUserMessageAuthenticationException
+            ? $exception->getMessage()
+            : $exception->getMessageKey();
 
         return ApiResponse::error(
-            status: HttpErrorCode::UNAUTHORIZED,
-            message: $errorMessage,
+            HttpErrorCode::UNAUTHORIZED,
+            'auth.unauthorized',
+            $message,
         );
     }
 }

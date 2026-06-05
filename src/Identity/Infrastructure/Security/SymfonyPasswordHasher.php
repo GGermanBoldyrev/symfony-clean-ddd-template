@@ -7,10 +7,13 @@ namespace App\Identity\Infrastructure\Security;
 use App\Identity\Application\Port\PasswordHasherPort;
 use App\Identity\Domain\ValueObject\User\HashedPassword;
 use App\Identity\Domain\ValueObject\User\PlainPassword;
+use App\Identity\Domain\ValueObject\User\UserId;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class SymfonyPasswordHasher implements PasswordHasherPort
 {
+    private const string MOCK_USER_ID = '00000000-0000-0000-0000-000000000000';
+
     public function __construct(
         private readonly UserPasswordHasherInterface $hasher,
     ) {
@@ -18,7 +21,10 @@ final class SymfonyPasswordHasher implements PasswordHasherPort
 
     public function hash(PlainPassword $password): HashedPassword
     {
-        $principal = new SecurityUser('', '');
+        $userId = UserId::fromString(self::MOCK_USER_ID);
+        $passwordHash = HashedPassword::fromRawHash('');
+
+        $principal = new SecurityUser($userId, $passwordHash);
 
         $hash = $this->hasher->hashPassword($principal, $password->toString());
 
@@ -27,7 +33,9 @@ final class SymfonyPasswordHasher implements PasswordHasherPort
 
     public function verify(PlainPassword $password, HashedPassword $hash): bool
     {
-        $principal = new SecurityUser('', $hash->toString());
+        $userId = UserId::fromString(self::MOCK_USER_ID);
+
+        $principal = new SecurityUser($userId, $hash);
 
         return $this->hasher->isPasswordValid($principal, $password->toString());
     }

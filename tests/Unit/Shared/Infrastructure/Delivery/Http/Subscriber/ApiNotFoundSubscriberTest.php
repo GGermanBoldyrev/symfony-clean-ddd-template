@@ -18,6 +18,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 final class ApiNotFoundSubscriberTest extends TestCase
 {
+    private const string NOT_FOUND_JSON = '{"success":false,"error":{"code":"route.not_found","message":"Not Found"}}';
+
     #[Test]
     public function itHasCorrectEventListenerAttributes(): void
     {
@@ -51,7 +53,7 @@ final class ApiNotFoundSubscriberTest extends TestCase
         self::assertNotNull($event->getResponse());
         self::assertSame(404, $event->getResponse()->getStatusCode());
         self::assertJsonStringEqualsJsonString(
-            '{"success":false,"error":"Not Found"}',
+            self::NOT_FOUND_JSON,
             (string) $event->getResponse()->getContent(),
         );
     }

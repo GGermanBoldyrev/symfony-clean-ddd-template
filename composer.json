@@ -35,7 +35,8 @@
         "phpunit/phpunit": "*",
         "roave/security-advisories": "dev-latest",
         "symfony/browser-kit": "8.1.*",
-        "symfony/http-client": "8.1.*"
+        "symfony/http-client": "8.1.*",
+        "symfony/maker-bundle": "^1.67"
     },
     "config": {
         "allow-plugins": {

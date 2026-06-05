@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Identity\Application\Command\VerifyCode;
 
+use App\Identity\Domain\Exception\VerificationCode\InvalidCodeException;
+use App\Identity\Domain\Exception\VerificationCode\MaxAttemptsExceededException;
 use App\Identity\Domain\Exception\VerificationCode\VerificationCodeNotFoundException;
 use App\Identity\Domain\Repository\UserRepositoryInterface;
 use App\Identity\Domain\Repository\VerificationCodeRepositoryInterface;
@@ -31,7 +33,13 @@ final readonly class VerifyCodeCommandHandler
             throw VerificationCodeNotFoundException::forEmail($command->email);
         }
 
-        $verificationCode->verify($input);
+        try {
+            $verificationCode->verify($input);
+        } catch (InvalidCodeException|MaxAttemptsExceededException $exception) {
+            $this->codes->save($verificationCode);
+
+            throw $exception;
+        }
 
         $user = $this->users->findByEmail($email);
 

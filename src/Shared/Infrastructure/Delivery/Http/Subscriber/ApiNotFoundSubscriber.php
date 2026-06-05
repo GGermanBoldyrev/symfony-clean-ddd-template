@@ -18,14 +18,12 @@ final class ApiNotFoundSubscriber
 {
     public function onKernelRequest(RequestEvent $event): void
     {
-        // Если основной запрос, а не внутренний редирект
         if (!$event->isMainRequest()) {
             return;
         }
 
-        // С запроса на главную - 404
         if ($event->getRequest()->getPathInfo() === '/') {
-            $event->setResponse(ApiResponse::error(HttpErrorCode::NOT_FOUND));
+            $event->setResponse(ApiResponse::error(HttpErrorCode::NOT_FOUND, 'route.not_found'));
         }
     }
 
@@ -35,6 +33,6 @@ final class ApiNotFoundSubscriber
             return;
         }
 
-        $event->setResponse(ApiResponse::error(HttpErrorCode::NOT_FOUND));
+        $event->setResponse(ApiResponse::error(HttpErrorCode::NOT_FOUND, 'route.not_found'));
     }
 }

@@ -13,7 +13,8 @@ abstract readonly class StringValueObject implements Stringable
 {
     protected function __construct(
         protected string $value,
-    ) {}
+    ) {
+    }
 
     final public function toString(): string
     {

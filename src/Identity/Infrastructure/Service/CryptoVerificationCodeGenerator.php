@@ -15,7 +15,7 @@ final class CryptoVerificationCodeGenerator implements VerificationCodeGenerator
             string: (string) random_int(0, 999_999),
             length: 6,
             pad_string: '0',
-            pad_type: STR_PAD_LEFT,
+            pad_type: \STR_PAD_LEFT,
         );
 
         return VerificationCodeValue::fromString($code);

@@ -27,7 +27,7 @@ return new PhpCsFixer\Config()
 
         // Импорты (сортировка по алфавиту, глобальные классы импортируются)
         'ordered_imports' => ['sort_algorithm' => 'alpha', 'imports_order' => ['class', 'function', 'const']],
-        'global_namespace_import' => ['import_classes' => true, 'import_constants' => true, 'import_functions' => true],
+        'global_namespace_import' => ['import_classes' => true, 'import_constants' => false, 'import_functions' => false],
 
         // Чистота кода и читаемость
         'yoda_style' => false, // Пишем if ($a === 1), а не if (1 === $a)

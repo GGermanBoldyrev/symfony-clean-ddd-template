@@ -7,7 +7,7 @@ namespace App\Identity\Domain\Entity;
 use App\Identity\Domain\Exception\VerificationCode\CodeExpiredException;
 use App\Identity\Domain\Exception\VerificationCode\InvalidCodeException;
 use App\Identity\Domain\Exception\VerificationCode\MaxAttemptsExceededException;
-use App\Identity\Domain\Exception\VerificationCode\ResendNotAllowedYetException;
+use App\Identity\Domain\Exception\VerificationCode\ResendCooldownException;
 use App\Identity\Domain\ValueObject\User\Email;
 use App\Identity\Domain\ValueObject\VerificationCode\AttemptCount;
 use App\Identity\Domain\ValueObject\VerificationCode\ExpiresAt;
@@ -88,12 +88,12 @@ final class VerificationCode
     }
 
     /**
-     * @throws ResendNotAllowedYetException when the resend window is not open
+     * @throws ResendCooldownException when the resend window is not open
      */
     public function assertCanResend(): void
     {
         if (!$this->resendAfter->isAllowed()) {
-            throw ResendNotAllowedYetException::before($this->resendAfter->toDateTimeImmutable());
+            throw ResendCooldownException::before($this->resendAfter->toDateTimeImmutable());
         }
     }
 

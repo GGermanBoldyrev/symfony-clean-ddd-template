@@ -39,10 +39,13 @@ final class ApiPayloadTest extends TestCase
     #[Test]
     public function itSerializesErrorPayloadWithDefaultMessage(): void
     {
-        $payload = new ApiErrorPayload(HttpErrorCode::NOT_FOUND);
+        $payload = new ApiErrorPayload(HttpErrorCode::NOT_FOUND, 'route.not_found');
         $expected = [
             'success' => false,
-            'error' => 'Not Found',
+            'error' => [
+                'code' => 'route.not_found',
+                'message' => 'Not Found',
+            ],
         ];
 
         self::assertSame($expected, $payload->jsonSerialize());
@@ -52,15 +55,19 @@ final class ApiPayloadTest extends TestCase
     public function itSerializesErrorPayloadWithCustomMessageAndDetails(): void
     {
         $payload = new ApiErrorPayload(
-            HttpErrorCode::UNPROCESSABLE_ENTITY,
-            'Validation failed',
-            ['email' => ['Invalid format']],
+            status: HttpErrorCode::UNPROCESSABLE_ENTITY,
+            errorCode: 'validation.failed',
+            message: 'Validation failed',
+            details: ['email' => ['Invalid format']],
         );
 
         $expected = [
             'success' => false,
-            'error' => 'Validation failed',
-            'details' => ['email' => ['Invalid format']],
+            'error' => [
+                'code' => 'validation.failed',
+                'message' => 'Validation failed',
+                'details' => ['email' => ['Invalid format']],
+            ],
         ];
 
         self::assertSame($expected, $payload->jsonSerialize());

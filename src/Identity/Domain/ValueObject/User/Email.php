@@ -15,7 +15,7 @@ final readonly class Email extends StringValueObject
     {
         $normalised = mb_strtolower(trim($value));
 
-        if (!filter_var($normalised, FILTER_VALIDATE_EMAIL)) {
+        if (filter_var($normalised, \FILTER_VALIDATE_EMAIL) === false) {
             throw InvalidEmailException::invalidFormat($value);
         }
 
