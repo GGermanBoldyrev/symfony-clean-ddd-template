@@ -10,8 +10,6 @@ use App\Identity\Application\Command\ResendVerificationCode\ResendVerificationCo
 use App\Identity\Application\Command\ResendVerificationCode\ResendVerificationCodeCommandHandler;
 use App\Identity\Domain\Entity\User;
 use App\Identity\Domain\Entity\VerificationCode;
-use App\Identity\Domain\Exception\User\UserAlreadyVerifiedException;
-use App\Identity\Domain\Exception\VerificationCode\ResendCooldownException;
 use App\Identity\Domain\ValueObject\User\DataPolicyAcceptedAt;
 use App\Identity\Domain\ValueObject\User\Email;
 use App\Identity\Domain\ValueObject\User\HashedPassword;
@@ -60,13 +58,28 @@ final class ResendVerificationCodeCommandHandlerTest extends TestCase
     }
 
     #[Test]
-    public function itRejectsAlreadyVerifiedUser(): void
+    public function itSilentlySkipsSendingWhenCooldownIsActive(): void
+    {
+        $email = Email::fromString('user@example.com');
+        $this->users()->save($this->user('user@example.com', verified: false));
+        $this->codes()->upsert($this->verificationCode($email, resendAfter: new DateTimeImmutable('+1 minute')));
+
+        $this->handler()(new ResendVerificationCodeCommand('user@example.com'));
+
+        self::assertSame(1, $this->codes()->count());
+        self::assertSame(1, $this->codes()->upsertCount());
+        self::assertSame(0, $this->mailer()->count());
+    }
+
+    #[Test]
+    public function itSilentlyIgnoresVerifiedUser(): void
     {
         $this->users()->save($this->user('user@example.com', verified: true));
 
-        $this->expectException(UserAlreadyVerifiedException::class);
-
         $this->handler()(new ResendVerificationCodeCommand('user@example.com'));
+
+        self::assertSame(0, $this->codes()->count());
+        self::assertSame(0, $this->mailer()->count());
     }
 
     #[Test]
@@ -79,22 +92,6 @@ final class ResendVerificationCodeCommandHandlerTest extends TestCase
         self::assertSame(1, $this->codes()->count());
         self::assertSame(1, $this->codes()->upsertCount());
         self::assertSame([['email' => 'user@example.com', 'code' => '654321']], $this->mailer()->sent());
-    }
-
-    #[Test]
-    public function itRejectsExistingCodeDuringCooldown(): void
-    {
-        $email = Email::fromString('user@example.com');
-        $this->users()->save($this->user('user@example.com', verified: false));
-        $this->codes()->upsert($this->verificationCode($email, resendAfter: new DateTimeImmutable('+1 minute')));
-
-        try {
-            $this->handler()(new ResendVerificationCodeCommand('user@example.com'));
-            self::fail('Expected resend cooldown exception.');
-        } catch (ResendCooldownException) {
-            self::assertSame(1, $this->codes()->upsertCount());
-            self::assertSame(0, $this->mailer()->count());
-        }
     }
 
     #[Test]
