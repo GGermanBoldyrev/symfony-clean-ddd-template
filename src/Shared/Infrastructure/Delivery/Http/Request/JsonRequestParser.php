@@ -26,10 +26,11 @@ final class JsonRequestParser
 
         $data = json_decode($content, true);
 
-        if (!\is_array($data)) {
+        if (!\is_array($data) || json_last_error() !== \JSON_ERROR_NONE) {
             throw BadRequestException::invalidJson();
         }
 
+        /** @var array<string, mixed> $data */
         return $data;
     }
 

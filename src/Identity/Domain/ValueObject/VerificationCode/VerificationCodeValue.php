@@ -13,7 +13,7 @@ final readonly class VerificationCodeValue extends StringValueObject
 
     public static function fromString(string $value): self
     {
-        if (!preg_match('/^\d{' . self::LENGTH . '}$/', $value)) {
+        if (preg_match('/^\d{' . self::LENGTH . '}$/', $value) !== 1) {
             throw InvalidVerificationCodeValueException::invalidFormat($value);
         }
 

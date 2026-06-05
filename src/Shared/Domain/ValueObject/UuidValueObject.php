@@ -12,6 +12,7 @@ use Stringable;
  */
 abstract readonly class UuidValueObject implements Stringable
 {
+    /** @param non-empty-string $value */
     protected function __construct(
         protected string $value,
     ) {
@@ -22,14 +23,23 @@ abstract readonly class UuidValueObject implements Stringable
      */
     public static function generate(): static
     {
-        return new static(UuidGenerator::generate());
+        /** @var class-string<static> $class */
+        $class = static::class;
+
+        return new $class(UuidGenerator::generate());
     }
 
+    /**
+     * @return non-empty-string
+     */
     final public function toString(): string
     {
         return $this->value;
     }
 
+    /**
+     * @return non-empty-string
+     */
     final public function __toString(): string
     {
         return $this->value;
@@ -42,6 +52,10 @@ abstract readonly class UuidValueObject implements Stringable
 
     /**
      * Validates UUID format and invokes the callback when invalid.
+     *
+     * @psalm-assert non-empty-string $value
+     *
+     * @phpstan-assert non-empty-string $value
      *
      * @param callable(): never $onInvalid
      */

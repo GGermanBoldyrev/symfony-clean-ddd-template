@@ -50,9 +50,7 @@ parameters:
                 - src/*/Infrastructure/*
             reportUnmatched: false
 
-        # ---------------------------------------------------------------------
         # Игнорируем особенности Symfony Boilerplate (Kernel & Bootstrap)
-        # ---------------------------------------------------------------------
         -
             message: '#^Method App\\Kernel::getAllowedEnvs\(\) is unused\.#'
             path: src/Kernel.php
@@ -64,3 +62,8 @@ parameters:
         -
             message: '#^Only booleans are allowed in an if condition, mixed given\.#'
             path: tests/bootstrap.php
+
+        # Игнорируем ошибки неинициализированных свойств в Doctrine Entities
+        -
+            message: '#Class .*\\Infrastructure\\Persistence\\Doctrine\\Entity\\.* has an uninitialized property.*#'
+            path: src/*/Infrastructure/Persistence/Doctrine/Entity/*

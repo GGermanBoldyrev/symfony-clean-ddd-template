@@ -34,8 +34,8 @@ final class UserProvider implements UserProviderInterface
         }
 
         return new SecurityUser(
-            userId: $user->id->toString(),
-            passwordHash: $user->passwordHash->toString(),
+            userId: $user->id,
+            passwordHash: $user->passwordHash,
         );
     }
 

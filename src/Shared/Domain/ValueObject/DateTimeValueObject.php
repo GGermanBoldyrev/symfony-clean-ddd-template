@@ -20,6 +20,6 @@ abstract readonly class DateTimeValueObject
 
     final public function equals(self $other): bool
     {
-        return $this->value == $other->value;
+        return $this->value === $other->value;
     }
 }

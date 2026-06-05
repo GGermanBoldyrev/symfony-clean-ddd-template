@@ -27,7 +27,7 @@ final class JwtAuthenticator extends AbstractAuthenticator
     ) {
     }
 
-    public function supports(Request $request): ?bool
+    public function supports(Request $request): bool
     {
         $header = $request->headers->get('Authorization', '');
 
