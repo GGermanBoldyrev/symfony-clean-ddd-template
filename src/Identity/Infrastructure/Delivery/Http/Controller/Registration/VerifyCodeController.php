@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Controller\Auth;
+namespace App\Identity\Infrastructure\Delivery\Http\Controller\Registration;
 
 use App\Identity\Application\Command\VerifyCode\VerifyCodeCommand;
-use App\Identity\Infrastructure\Delivery\Http\Request\Auth\VerifyCodeRequest;
+use App\Identity\Infrastructure\Delivery\Http\Request\Registration\VerifyCodeRequest;
 use App\Shared\Infrastructure\Delivery\Http\Response\ApiResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Messenger\MessageBusInterface;

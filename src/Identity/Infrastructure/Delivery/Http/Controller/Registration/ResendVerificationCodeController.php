@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Controller\Auth;
+namespace App\Identity\Infrastructure\Delivery\Http\Controller\Registration;
 
 use App\Identity\Application\Command\ResendVerificationCode\ResendVerificationCodeCommand;
-use App\Identity\Infrastructure\Delivery\Http\Request\Auth\ResendVerificationCodeRequest;
+use App\Identity\Infrastructure\Delivery\Http\Request\Registration\ResendVerificationCodeRequest;
 use App\Shared\Infrastructure\Delivery\Http\Response\ApiResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -27,7 +27,7 @@ final readonly class ResendVerificationCodeController
             email: $parsedRequest->email,
         ));
 
-        // Всегда отвечаем 200.
+        // Always 200, do not reveal registered accounts.
         return ApiResponse::success([
             'message' => 'If the account exists and is unverified, a new code has been sent.',
         ]);

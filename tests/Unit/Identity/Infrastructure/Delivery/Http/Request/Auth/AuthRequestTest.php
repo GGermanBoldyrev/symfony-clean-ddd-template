@@ -6,10 +6,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Identity\Infrastructure\Delivery\Http\Request\Auth;
 
-use App\Identity\Infrastructure\Delivery\Http\Request\Auth\LoginRequest;
-use App\Identity\Infrastructure\Delivery\Http\Request\Auth\RegisterRequest;
-use App\Identity\Infrastructure\Delivery\Http\Request\Auth\ResendVerificationCodeRequest;
-use App\Identity\Infrastructure\Delivery\Http\Request\Auth\VerifyCodeRequest;
+use App\Identity\Infrastructure\Delivery\Http\Request\Authentication\LoginRequest;
+use App\Identity\Infrastructure\Delivery\Http\Request\Registration\RegisterRequest;
+use App\Identity\Infrastructure\Delivery\Http\Request\Registration\ResendVerificationCodeRequest;
+use App\Identity\Infrastructure\Delivery\Http\Request\Registration\VerifyCodeRequest;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;

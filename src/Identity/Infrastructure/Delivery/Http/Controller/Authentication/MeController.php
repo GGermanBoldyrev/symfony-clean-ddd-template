@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controller\Auth;
+namespace App\Identity\Infrastructure\Delivery\Http\Controller\Authentication;
 
 use App\Identity\Application\Dto\CurrentUserDto;
 use App\Identity\Application\Query\GetCurrentUser\GetCurrentUserQuery;

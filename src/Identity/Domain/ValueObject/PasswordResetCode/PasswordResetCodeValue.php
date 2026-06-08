@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Identity\Domain\ValueObject\VerificationCode;
+namespace App\Identity\Domain\ValueObject\PasswordResetCode;
 
-use App\Identity\Domain\Exception\VerificationCode\InvalidVerificationCodeValueException;
 use App\Shared\Domain\ValueObject\StringValueObject;
 
-final readonly class VerificationCodeValue extends StringValueObject
+final readonly class PasswordResetCodeValue extends StringValueObject
 {
     private const int LENGTH = 6;
 
@@ -16,7 +15,7 @@ final readonly class VerificationCodeValue extends StringValueObject
         $trimmed = trim($value);
 
         if (preg_match('/^\d{' . self::LENGTH . '}$/', $trimmed) !== 1) {
-            throw InvalidVerificationCodeValueException::invalidFormat($trimmed);
+            throw InvalidPasswordResetCodeException::invalidFormat($trimmed);
         }
 
         return new self($trimmed);

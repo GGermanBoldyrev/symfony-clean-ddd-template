@@ -2,17 +2,8 @@
 
 declare(strict_types=1);
 
-// tests/Unit/Controller/Auth/AuthControllerTest.php
+namespace App\Tests\Unit\Identity\Infrastructure\Delivery\Http\Controller;
 
-namespace App\Tests\Unit\Controller\Auth;
-
-use App\Controller\Auth\LoginController;
-use App\Controller\Auth\LogoutController;
-use App\Controller\Auth\MeController;
-use App\Controller\Auth\RefreshController;
-use App\Controller\Auth\RegisterController;
-use App\Controller\Auth\ResendVerificationCodeController;
-use App\Controller\Auth\VerifyCodeController;
 use App\Identity\Application\Command\Login\LoginCommand;
 use App\Identity\Application\Command\RefreshToken\RefreshTokenCommand;
 use App\Identity\Application\Command\Register\RegisterCommand;
@@ -25,6 +16,13 @@ use App\Identity\Domain\ValueObject\AccessToken;
 use App\Identity\Domain\ValueObject\RefreshToken;
 use App\Identity\Domain\ValueObject\User\HashedPassword;
 use App\Identity\Domain\ValueObject\User\UserId;
+use App\Identity\Infrastructure\Delivery\Http\Controller\Authentication\LoginController;
+use App\Identity\Infrastructure\Delivery\Http\Controller\Authentication\LogoutController;
+use App\Identity\Infrastructure\Delivery\Http\Controller\Authentication\MeController;
+use App\Identity\Infrastructure\Delivery\Http\Controller\Authentication\RefreshController;
+use App\Identity\Infrastructure\Delivery\Http\Controller\Registration\RegisterController;
+use App\Identity\Infrastructure\Delivery\Http\Controller\Registration\ResendVerificationCodeController;
+use App\Identity\Infrastructure\Delivery\Http\Controller\Registration\VerifyCodeController;
 use App\Identity\Infrastructure\Delivery\Http\Cookie\AuthCookieFactory;
 use App\Identity\Infrastructure\Security\SecurityUser;
 use App\Tests\Unit\Identity\Application\TestDouble\FakeTokenManager;
@@ -41,7 +39,7 @@ final class AuthControllerTest extends TestCase
     public function registerDispatchesCommandAndReturnsCreatedResponse(): void
     {
         $bus = new RecordingMessageBus();
-        $response = (new RegisterController($bus))(
+        $response = new RegisterController($bus)(
             $this->jsonRequest('{"email":"user@example.com","password":"secret123","data_policy":true}'),
         );
 
@@ -66,7 +64,7 @@ final class AuthControllerTest extends TestCase
             RefreshToken::fromString('refresh-token'),
         ));
 
-        $response = (new LoginController($bus, $tokens, secureCookies: true))(
+        $response = new LoginController($bus, $tokens, secureCookies: true)(
             $this->jsonRequest('{"email":"user@example.com","password":"secret123"}'),
         );
 
@@ -89,7 +87,7 @@ final class AuthControllerTest extends TestCase
     public function verifyCodeDispatchesCommandAndReturnsSuccessResponse(): void
     {
         $bus = new RecordingMessageBus();
-        $response = (new VerifyCodeController($bus))(
+        $response = new VerifyCodeController($bus)(
             $this->jsonRequest('{"email":"user@example.com","code":"123456"}'),
         );
 
@@ -107,7 +105,7 @@ final class AuthControllerTest extends TestCase
     public function resendVerificationCodeDispatchesCommandAndReturnsPrivacyPreservingMessage(): void
     {
         $bus = new RecordingMessageBus();
-        $response = (new ResendVerificationCodeController($bus))(
+        $response = new ResendVerificationCodeController($bus)(
             $this->jsonRequest('{"email":"user@example.com"}'),
         );
 
@@ -149,7 +147,7 @@ final class AuthControllerTest extends TestCase
         $request = Request::create('/');
         $request->cookies->set(AuthCookieFactory::REFRESH_TOKEN_COOKIE, 'old-refresh-token');
 
-        $response = (new RefreshController($bus, $tokens, secureCookies: false))($request);
+        $response = new RefreshController($bus, $tokens, secureCookies: false)($request);
 
         $message = $bus->dispatched()[0];
         self::assertInstanceOf(RefreshTokenCommand::class, $message);
@@ -167,7 +165,7 @@ final class AuthControllerTest extends TestCase
     #[Test]
     public function logoutClearsRefreshCookie(): void
     {
-        $response = (new LogoutController())();
+        $response = new LogoutController()();
 
         self::assertSame(204, $response->getStatusCode());
         $cookie = $this->firstCookie($response);
@@ -189,7 +187,7 @@ final class AuthControllerTest extends TestCase
         ));
         $securityUser = new SecurityUser($userId, HashedPassword::fromRawHash('hash'));
 
-        $response = (new MeController($bus))($securityUser);
+        $response = new MeController($bus)($securityUser);
 
         $message = $bus->dispatched()[0];
         self::assertInstanceOf(GetCurrentUserQuery::class, $message);

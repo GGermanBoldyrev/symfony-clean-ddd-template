@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Identity\Infrastructure\Delivery\Http\Request\Auth;
+namespace App\Identity\Infrastructure\Delivery\Http\Request\Authentication;
 
 use App\Shared\Infrastructure\Delivery\Http\Request\JsonRequestParser;
 use Symfony\Component\HttpFoundation\Request;
 
-final readonly class VerifyCodeRequest
+final readonly class LoginRequest
 {
     private function __construct(
         public string $email,
-        public string $code,
+        public string $password,
     ) {
     }
 
@@ -21,7 +21,7 @@ final readonly class VerifyCodeRequest
 
         return new self(
             email: JsonRequestParser::requireString($body, 'email'),
-            code: JsonRequestParser::requireString($body, 'code'),
+            password: JsonRequestParser::requireString($body, 'password'),
         );
     }
 }
