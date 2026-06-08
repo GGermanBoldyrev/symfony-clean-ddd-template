@@ -21,5 +21,5 @@ interface VerificationCodeRepositoryInterface
 
     public function delete(VerificationCodeId $id): void;
 
-    public function deleteExpired(): void;
+    public function deleteExpired(): int;
 }

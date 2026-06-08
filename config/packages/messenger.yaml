@@ -35,8 +35,11 @@ framework:
 
             sync: 'sync://'
 
+            scheduler_verification_code_purge:
+                dsn: 'scheduler://verification_code_purge'
+
         routing:
-        # 'App\Shared\Application\Message\AsyncMessageInterface': async
+            App\Identity\Application\Command\PurgeExpiredVerificationCodes\PurgeExpiredVerificationCodesCommand: scheduler_verification_code_purge
 
 when@test:
     framework:
@@ -44,3 +47,4 @@ when@test:
             transports:
                 async: 'in-memory://'
                 failed: 'in-memory://'
+                scheduler_verification_code_purge: 'in-memory://'
