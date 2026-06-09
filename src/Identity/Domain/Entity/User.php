@@ -18,21 +18,21 @@ final class User
     public private(set) DateTimeImmutable $updatedAt;
 
     public function __construct(
-        public readonly UserId               $id,
-        public readonly Email                $email,
-        public readonly HashedPassword       $passwordHash,
+        public readonly UserId $id,
+        public readonly Email $email,
+        public readonly HashedPassword $passwordHash,
         public readonly DataPolicyAcceptedAt $dataPolicyAcceptedAt,
-        public readonly DateTimeImmutable    $createdAt,
-        ?VerifiedAt                          $verifiedAt = null,
+        public readonly DateTimeImmutable $createdAt,
+        ?VerifiedAt $verifiedAt = null,
     ) {
         $this->verifiedAt = $verifiedAt;
         $this->updatedAt = $createdAt;
     }
 
     public static function register(
-        UserId               $id,
-        Email                $email,
-        HashedPassword       $passwordHash,
+        UserId $id,
+        Email $email,
+        HashedPassword $passwordHash,
         DataPolicyAcceptedAt $dataPolicyAcceptedAt,
     ): self {
         return new self(

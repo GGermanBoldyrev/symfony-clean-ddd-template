@@ -12,7 +12,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 final class SecurityUser implements UserInterface, PasswordAuthenticatedUserInterface
 {
     public function __construct(
-        private readonly UserId         $userId,
+        private readonly UserId $userId,
         private readonly HashedPassword $passwordHash,
     ) {
     }

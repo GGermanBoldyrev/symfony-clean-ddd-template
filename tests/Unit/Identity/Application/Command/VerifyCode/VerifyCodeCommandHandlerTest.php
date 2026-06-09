@@ -161,10 +161,10 @@ final class VerifyCodeCommandHandlerTest extends TestCase
     }
 
     private function verificationCode(
-        Email  $email,
+        Email $email,
         string $value,
-        int    $maxAttempts = 5,
-        bool   $expired = false,
+        int $maxAttempts = 5,
+        bool $expired = false,
     ): VerificationCode {
         return new VerificationCode(
             id: VerificationCodeId::generate(),
