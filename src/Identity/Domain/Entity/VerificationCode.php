@@ -11,9 +11,9 @@ use App\Identity\Domain\Exception\VerificationCode\ResendCooldownException;
 use App\Identity\Domain\ValueObject\User\Email;
 use App\Identity\Domain\ValueObject\VerificationCode\AttemptCount;
 use App\Identity\Domain\ValueObject\VerificationCode\ExpiresAt;
-use App\Identity\Domain\ValueObject\VerificationCode\VerificationCodeId;
 use App\Identity\Domain\ValueObject\VerificationCode\MaxAttempts;
 use App\Identity\Domain\ValueObject\VerificationCode\ResendAfter;
+use App\Identity\Domain\ValueObject\VerificationCode\VerificationCodeId;
 use App\Identity\Domain\ValueObject\VerificationCode\VerificationCodeValue;
 use DateTimeImmutable;
 
@@ -23,26 +23,26 @@ final class VerificationCode
     public private(set) DateTimeImmutable $updatedAt;
 
     public function __construct(
-        public readonly VerificationCodeId    $id,
-        public readonly Email                 $email,
+        public readonly VerificationCodeId $id,
+        public readonly Email $email,
         public readonly VerificationCodeValue $code,
-        AttemptCount                          $attempts,
-        public readonly MaxAttempts           $maxAttempts,
-        public readonly ExpiresAt             $expiresAt,
-        public readonly ResendAfter           $resendAfter,
-        public readonly DateTimeImmutable     $createdAt,
+        AttemptCount $attempts,
+        public readonly MaxAttempts $maxAttempts,
+        public readonly ExpiresAt $expiresAt,
+        public readonly ResendAfter $resendAfter,
+        public readonly DateTimeImmutable $createdAt,
     ) {
         $this->attempts = $attempts;
         $this->updatedAt = $createdAt;
     }
 
     public static function issue(
-        VerificationCodeId    $id,
-        Email                 $email,
+        VerificationCodeId $id,
+        Email $email,
         VerificationCodeValue $code,
-        MaxAttempts           $maxAttempts,
-        ExpiresAt             $expiresAt,
-        ResendAfter           $resendAfter,
+        MaxAttempts $maxAttempts,
+        ExpiresAt $expiresAt,
+        ResendAfter $resendAfter,
     ): self {
         $now = new DateTimeImmutable();
 
@@ -65,7 +65,9 @@ final class VerificationCode
      */
     public function verify(VerificationCodeValue $submitted): void
     {
-        if ($this->expiresAt->isExpired()) {
+        $now = new DateTimeImmutable();
+
+        if ($this->expiresAt->isExpired($now)) {
             throw CodeExpiredException::expired();
         }
 
@@ -92,14 +94,18 @@ final class VerificationCode
      */
     public function assertCanResend(): void
     {
-        if (!$this->resendAfter->isAllowed()) {
+        $now = new DateTimeImmutable();
+
+        if (!$this->resendAfter->isAllowed($now)) {
             throw ResendCooldownException::before($this->resendAfter->toDateTimeImmutable());
         }
     }
 
     public function isExpired(): bool
     {
-        return $this->expiresAt->isExpired();
+        $now = new DateTimeImmutable();
+
+        return $this->expiresAt->isExpired($now);
     }
 
     public function isExhausted(): bool

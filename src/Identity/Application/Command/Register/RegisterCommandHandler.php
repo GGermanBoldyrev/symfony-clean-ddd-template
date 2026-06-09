@@ -69,7 +69,7 @@ final readonly class RegisterCommandHandler
         $existing = $this->codes->findByEmail($email);
 
         if ($existing !== null) {
-            if (!$existing->resendAfter->isAllowed()) {
+            if (!$existing->resendAfter->isAllowed($now)) {
                 return;
             }
         }

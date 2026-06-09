@@ -4,13 +4,34 @@ declare(strict_types=1);
 
 namespace App\Identity\Domain\ValueObject\PasswordResetCode;
 
+use App\Identity\Domain\Exception\PasswordResetCode\InvalidResendAfterException;
+use App\Identity\Domain\ValueObject\VerificationCode\ExpiresAt;
+use App\Shared\Domain\ValueObject\DateTimeValueObject;
 use DateTimeImmutable;
 
-final readonly class ResendAfter
+final readonly class ResendAfter extends DateTimeValueObject
 {
-    private function __construct(
-        public readonly DateTimeImmutable $value,
-    ) {
+    private function __construct(DateTimeImmutable $value)
+    {
+        parent::__construct($value);
+    }
+
+    public static function from(
+        DateTimeImmutable $value,
+        ExpiresAt $expiresAt,
+        ?DateTimeImmutable $now = null,
+    ): self {
+        $now ??= new DateTimeImmutable();
+
+        if ($value >= $now) {
+            throw InvalidResendAfterException::notInFuture();
+        }
+
+        if ($value >= $expiresAt->toDateTimeImmutable()) {
+            throw InvalidResendAfterException::afterExpiration();
+        }
+
+        return new self($value);
     }
 
     public static function fromDateTimeImmutable(DateTimeImmutable $value): self
@@ -18,9 +39,6 @@ final readonly class ResendAfter
         return new self($value);
     }
 
-    /**
-     * Returns true when enough time has passed and a new code may be sent.
-     */
     public function isAllowed(DateTimeImmutable $now): bool
     {
         return $now >= $this->value;

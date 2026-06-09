@@ -28,6 +28,8 @@ final readonly class ResendVerificationCodeCommandHandler
 
     public function __invoke(ResendVerificationCodeCommand $command): void
     {
+        $now = new DateTimeImmutable();
+
         $email = Email::fromString($command->email);
         $user = $this->users->findByEmail($email);
 
@@ -37,11 +39,10 @@ final readonly class ResendVerificationCodeCommandHandler
 
         $existing = $this->codes->findByEmail($email);
 
-        if ($existing !== null && !$existing->resendAfter->isAllowed()) {
+        if ($existing !== null && !$existing->resendAfter->isAllowed($now)) {
             return;
         }
 
-        $now = new DateTimeImmutable();
         $expiresAt = VerificationCodePolicy::expiresAt($now);
         $code = $this->codeGenerator->generate();
 

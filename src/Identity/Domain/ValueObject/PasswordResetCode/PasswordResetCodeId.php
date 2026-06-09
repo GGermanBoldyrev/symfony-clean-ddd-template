@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Identity\Domain\ValueObject\PasswordResetCode;
 
-use App\Identity\Domain\Exception\VerificationCode\InvalidVerificationCodeIdException;
+use App\Identity\Domain\Exception\PasswordResetCode\InvalidPasswordResetCodeIdException;
 use App\Shared\Domain\ValueObject\UuidValueObject;
 
 final readonly class PasswordResetCodeId extends UuidValueObject

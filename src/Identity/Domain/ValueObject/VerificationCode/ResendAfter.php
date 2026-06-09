@@ -15,9 +15,14 @@ final readonly class ResendAfter extends DateTimeValueObject
         parent::__construct($value);
     }
 
-    public static function from(DateTimeImmutable $value, ExpiresAt $expiresAt): self
-    {
-        if ($value <= new DateTimeImmutable()) {
+    public static function from(
+        DateTimeImmutable $value,
+        ExpiresAt $expiresAt,
+        ?DateTimeImmutable $now = null,
+    ): self {
+        $now ??= new DateTimeImmutable();
+
+        if ($value <= $now) {
             throw InvalidResendAfterException::notInFuture();
         }
 
@@ -33,8 +38,8 @@ final readonly class ResendAfter extends DateTimeValueObject
         return new self($value);
     }
 
-    public function isAllowed(): bool
+    public function isAllowed(DateTimeImmutable $now): bool
     {
-        return new DateTimeImmutable() >= $this->value;
+        return $now >= $this->value;
     }
 }

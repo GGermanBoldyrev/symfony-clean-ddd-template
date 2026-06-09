@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-// tests/Unit/Identity/Domain/ValueObject/VerificationCode/ResendAfterTest.php
-
 namespace App\Tests\Unit\Identity\Domain\ValueObject\VerificationCode;
 
 use App\Identity\Domain\Exception\VerificationCode\InvalidResendAfterException;
@@ -18,37 +16,51 @@ final class ResendAfterTest extends TestCase
     #[Test]
     public function itAcceptsFutureTimestampBeforeExpiration(): void
     {
-        $expiresAt = ExpiresAt::from(new DateTimeImmutable('+1 hour'));
-        $time = new DateTimeImmutable('+1 minute');
-        $resendAfter = ResendAfter::from($time, $expiresAt);
+        $now = new DateTimeImmutable();
+        $futureMinute = $now->modify('+1 minute');
+        $futureHour = $now->modify('+1 hour');
 
-        self::assertSame($time, $resendAfter->toDateTimeImmutable());
-        self::assertFalse($resendAfter->isAllowed());
+        $expiresAt = ExpiresAt::from($futureHour, $now);
+        $resendAfter = ResendAfter::from($futureMinute, $expiresAt, $now);
+
+        self::assertEquals($futureMinute, $resendAfter->toDateTimeImmutable());
+        self::assertFalse($resendAfter->isAllowed($now));
     }
 
     #[Test]
     public function itRejectsPastTimestamp(): void
     {
+        $now = new DateTimeImmutable();
+        $past = $now->modify('-1 minute');
+        $future = $now->modify('+1 hour');
+
         $this->expectException(InvalidResendAfterException::class);
 
-        ResendAfter::from(new DateTimeImmutable('-1 second'), ExpiresAt::from(new DateTimeImmutable('+1 hour')));
+        ResendAfter::from($past, ExpiresAt::from($future), $now);
     }
 
     #[Test]
     public function itRejectsTimestampAfterExpiration(): void
     {
-        $expiresAt = ExpiresAt::from(new DateTimeImmutable('+1 minute'));
+        $now = new DateTimeImmutable();
+        $expiresTime = $now->modify('+1 minute');
+        $resendAfterTime = $now->modify('+2 minutes');
+
+        $expiresAt = ExpiresAt::from($expiresTime, $now);
 
         $this->expectException(InvalidResendAfterException::class);
 
-        ResendAfter::from(new DateTimeImmutable('+2 minutes'), $expiresAt);
+        ResendAfter::from($resendAfterTime, $expiresAt, $now);
     }
 
     #[Test]
     public function itCanReconstructPastTimestampForPersistence(): void
     {
-        $resendAfter = ResendAfter::fromDateTimeImmutable(new DateTimeImmutable('-1 second'));
+        $now = new DateTimeImmutable();
+        $past = $now->modify('-1 second');
 
-        self::assertTrue($resendAfter->isAllowed());
+        $resendAfter = ResendAfter::fromDateTimeImmutable($past);
+
+        self::assertTrue($resendAfter->isAllowed($now));
     }
 }

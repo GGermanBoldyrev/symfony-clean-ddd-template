@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-// tests/Unit/Identity/Domain/ValueObject/VerificationCode/ExpiresAtTest.php
-
 namespace App\Tests\Unit\Identity\Domain\ValueObject\VerificationCode;
 
 use App\Identity\Domain\Exception\VerificationCode\InvalidExpiresAtException;
@@ -17,11 +15,13 @@ final class ExpiresAtTest extends TestCase
     #[Test]
     public function itAcceptsFutureTimestamp(): void
     {
-        $time = new DateTimeImmutable('+1 hour');
-        $expiresAt = ExpiresAt::from($time);
+        $now = new DateTimeImmutable();
+        $futureTime = $now->modify('+1 hour');
 
-        self::assertSame($time, $expiresAt->toDateTimeImmutable());
-        self::assertFalse($expiresAt->isExpired());
+        $expiresAt = ExpiresAt::from($futureTime, $now);
+
+        self::assertEquals($futureTime, $expiresAt->toDateTimeImmutable());
+        self::assertFalse($expiresAt->isExpired($now));
     }
 
     #[Test]
@@ -29,14 +29,20 @@ final class ExpiresAtTest extends TestCase
     {
         $this->expectException(InvalidExpiresAtException::class);
 
-        ExpiresAt::from(new DateTimeImmutable('-1 second'));
+        $now = new DateTimeImmutable();
+        $pastTime = $now->modify('-1 second');
+
+        ExpiresAt::from($pastTime, $now);
     }
 
     #[Test]
     public function itCanReconstructExpiredTimestamp(): void
     {
-        $expiresAt = ExpiresAt::fromDateTimeImmutable(new DateTimeImmutable('-1 second'));
+        $now = new DateTimeImmutable();
+        $pastTime = $now->modify('-1 second');
 
-        self::assertTrue($expiresAt->isExpired());
+        $expiresAt = ExpiresAt::fromDateTimeImmutable($pastTime);
+
+        self::assertTrue($expiresAt->isExpired($now));
     }
 }
