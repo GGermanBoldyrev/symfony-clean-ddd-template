@@ -33,9 +33,9 @@ services:
     # -------------------------------------------------------------------------
     # Controllers
     # -------------------------------------------------------------------------
-    App\Controller\:
-        resource: '../src/Controller/'
-        tags: ['controller.service_arguments']
+    App\Identity\Infrastructure\Delivery\Http\Controller\:
+        resource: '../src/Identity/Infrastructure/Delivery/Http/Controller'
+        tags: [ 'controller.service_arguments' ]
 
     # -------------------------------------------------------------------------
     # Port - Adapter bindings
@@ -77,10 +77,10 @@ services:
     # -------------------------------------------------------------------------
     # Controllers with scalar dependencies
     # -------------------------------------------------------------------------
-    App\Controller\Auth\LoginController:
+    App\Identity\Infrastructure\Delivery\Http\Controller\Authentication\LoginController:
         arguments:
             $secureCookies: '%app.secure_cookies%'
 
-    App\Controller\Auth\RefreshController:
+    App\Identity\Infrastructure\Delivery\Http\Controller\Authentication\RefreshController:
         arguments:
             $secureCookies: '%app.secure_cookies%'

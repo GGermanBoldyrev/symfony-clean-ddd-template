@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Controller\Auth;
+namespace App\Identity\Infrastructure\Delivery\Http\Controller\Authentication;
 
 use App\Identity\Application\Command\Login\LoginCommand;
 use App\Identity\Application\Dto\TokenPairDto;
 use App\Identity\Application\Port\TokenManagerPort;
 use App\Identity\Infrastructure\Delivery\Http\Cookie\AuthCookieFactory;
-use App\Identity\Infrastructure\Delivery\Http\Request\Auth\LoginRequest;
+use App\Identity\Infrastructure\Delivery\Http\Request\Authentication\LoginRequest;
 use App\Shared\Infrastructure\Delivery\Http\Response\ApiResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Messenger\MessageBusInterface;

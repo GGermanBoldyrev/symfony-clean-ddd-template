@@ -9,7 +9,6 @@ use App\Identity\Application\Port\VerificationCodeGeneratorPort;
 use App\Identity\Application\Port\VerificationMailerPort;
 use App\Identity\Domain\Entity\User;
 use App\Identity\Domain\Entity\VerificationCode;
-use App\Identity\Domain\Exception\User\UserAlreadyVerifiedException;
 use App\Identity\Domain\Repository\UserRepositoryInterface;
 use App\Identity\Domain\Repository\VerificationCodeRepositoryInterface;
 use App\Identity\Domain\Service\VerificationCodePolicy;
@@ -40,11 +39,9 @@ final readonly class RegisterCommandHandler
         $existingUser = $this->users->findByEmail($email);
 
         if ($existingUser !== null) {
-            if ($existingUser->isVerified()) {
-                throw new UserAlreadyVerifiedException($email);
+            if (!$existingUser->isVerified()) {
+                $this->issueAndSendCodeIfAllowed($email);
             }
-
-            $this->issueAndSendCode($email);
 
             return;
         }
@@ -61,10 +58,10 @@ final readonly class RegisterCommandHandler
         );
 
         $this->users->save($user);
-        $this->issueAndSendCode($email);
+        $this->issueAndSendCodeIfAllowed($email);
     }
 
-    private function issueAndSendCode(Email $email): void
+    private function issueAndSendCodeIfAllowed(Email $email): void
     {
         $now = new DateTimeImmutable();
         $expiresAt = VerificationCodePolicy::expiresAt($now);
@@ -72,7 +69,9 @@ final readonly class RegisterCommandHandler
         $existing = $this->codes->findByEmail($email);
 
         if ($existing !== null) {
-            $existing->assertCanResend();
+            if (!$existing->resendAfter->isAllowed($now)) {
+                return;
+            }
         }
 
         $code = $this->codeGenerator->generate();

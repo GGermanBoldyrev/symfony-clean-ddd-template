@@ -65,7 +65,9 @@ final class VerificationCode
      */
     public function verify(VerificationCodeValue $submitted): void
     {
-        if ($this->expiresAt->isExpired()) {
+        $now = new DateTimeImmutable();
+
+        if ($this->expiresAt->isExpired($now)) {
             throw CodeExpiredException::expired();
         }
 
@@ -92,14 +94,18 @@ final class VerificationCode
      */
     public function assertCanResend(): void
     {
-        if (!$this->resendAfter->isAllowed()) {
+        $now = new DateTimeImmutable();
+
+        if (!$this->resendAfter->isAllowed($now)) {
             throw ResendCooldownException::before($this->resendAfter->toDateTimeImmutable());
         }
     }
 
     public function isExpired(): bool
     {
-        return $this->expiresAt->isExpired();
+        $now = new DateTimeImmutable();
+
+        return $this->expiresAt->isExpired($now);
     }
 
     public function isExhausted(): bool

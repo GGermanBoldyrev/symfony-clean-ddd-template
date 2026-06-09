@@ -15,9 +15,11 @@ final readonly class ExpiresAt extends DateTimeValueObject
         parent::__construct($value);
     }
 
-    public static function from(DateTimeImmutable $value): self
+    public static function from(DateTimeImmutable $value, ?DateTimeImmutable $now = null): self
     {
-        if ($value <= new DateTimeImmutable()) {
+        $now ??= new DateTimeImmutable();
+
+        if ($value <= $now) {
             throw InvalidExpiresAtException::notInFuture();
         }
 
@@ -29,8 +31,8 @@ final readonly class ExpiresAt extends DateTimeValueObject
         return new self($value);
     }
 
-    public function isExpired(): bool
+    public function isExpired(DateTimeImmutable $now): bool
     {
-        return new DateTimeImmutable() > $this->value;
+        return $now >= $this->value;
     }
 }

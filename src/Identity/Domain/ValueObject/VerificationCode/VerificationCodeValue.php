@@ -13,13 +13,16 @@ final readonly class VerificationCodeValue extends StringValueObject
 
     public static function fromString(string $value): self
     {
-        if (preg_match('/^\d{' . self::LENGTH . '}$/', $value) !== 1) {
-            throw InvalidVerificationCodeValueException::invalidFormat($value);
+        $trimmed = trim($value);
+
+        if (preg_match('/^\d{' . self::LENGTH . '}$/', $trimmed) !== 1) {
+            throw InvalidVerificationCodeValueException::invalidFormat($trimmed);
         }
 
-        return new self($value);
+        return new self($trimmed);
     }
 
+    // Crypto-safe comparison
     public function matches(self $submitted): bool
     {
         return hash_equals($this->value, $submitted->value);

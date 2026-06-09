@@ -75,14 +75,16 @@ final class DoctrineVerificationCodeRepository implements VerificationCodeReposi
         }
     }
 
-    public function deleteExpired(): void
+    public function deleteExpired(): int
     {
-        $this->em->createQueryBuilder()
+        $result = $this->em->createQueryBuilder()
             ->delete(VerificationCodeDoctrineEntity::class, 'v')
             ->where('v.expiresAt < :now')
             ->setParameter('now', new DateTimeImmutable())
             ->getQuery()
             ->execute();
+
+        return \is_scalar($result) ? (int) $result : 0;
     }
 
     private function toDomain(VerificationCodeDoctrineEntity $entity): VerificationCode

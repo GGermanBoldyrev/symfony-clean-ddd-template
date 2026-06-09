@@ -7,12 +7,10 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Shared\Infrastructure\Delivery\Http\Subscriber;
 
 use App\Identity\Domain\Exception\User\InvalidEmailException;
-use App\Identity\Domain\Exception\User\UserAlreadyVerifiedException;
 use App\Identity\Domain\Exception\User\UserNotFoundException;
 use App\Identity\Domain\Exception\VerificationCode\MaxAttemptsExceededException;
 use App\Identity\Domain\Exception\VerificationCode\ResendCooldownException;
 use App\Identity\Domain\Exception\VerificationCode\VerificationCodeNotFoundException;
-use App\Identity\Domain\ValueObject\User\Email;
 use App\Shared\Domain\Exception\DomainExceptionInterface;
 use App\Shared\Infrastructure\Delivery\Http\Subscriber\DomainExceptionSubscriber;
 use DateTimeImmutable;
@@ -36,7 +34,7 @@ final class DomainExceptionSubscriberTest extends TestCase
     ): void {
         $event = $this->event('/api/v1/test', $exception);
 
-        (new DomainExceptionSubscriber())($event);
+        new DomainExceptionSubscriber()($event);
 
         $response = $event->getResponse();
         self::assertNotNull($response);
@@ -49,7 +47,7 @@ final class DomainExceptionSubscriberTest extends TestCase
     {
         $event = $this->event('/web', InvalidEmailException::invalidFormat('bad'));
 
-        (new DomainExceptionSubscriber())($event);
+        new DomainExceptionSubscriber()($event);
 
         self::assertNull($event->getResponse());
     }
@@ -59,7 +57,7 @@ final class DomainExceptionSubscriberTest extends TestCase
     {
         $event = $this->event('/api/v1/test', new RuntimeException('boom'));
 
-        (new DomainExceptionSubscriber())($event);
+        new DomainExceptionSubscriber()($event);
 
         self::assertNull($event->getResponse());
     }
@@ -75,11 +73,6 @@ final class DomainExceptionSubscriberTest extends TestCase
                 VerificationCodeNotFoundException::forEmail('user@example.com'),
                 404,
                 'verification_code.not_found',
-            ],
-            'already verified' => [
-                new UserAlreadyVerifiedException(Email::fromString('user@example.com')),
-                409,
-                'user.already_verified',
             ],
             'max attempts' => [
                 MaxAttemptsExceededException::exceeded(),

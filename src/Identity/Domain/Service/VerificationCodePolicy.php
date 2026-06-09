@@ -21,6 +21,7 @@ final class VerificationCodePolicy
     {
         return ExpiresAt::from(
             $now->modify(\sprintf('+%d seconds', self::TTL_SECONDS)),
+            $now,
         );
     }
 
@@ -29,6 +30,7 @@ final class VerificationCodePolicy
         return ResendAfter::from(
             $now->modify(\sprintf('+%d seconds', self::RESEND_COOLDOWN_SECONDS)),
             $expiresAt,
+            $now,
         );
     }
 

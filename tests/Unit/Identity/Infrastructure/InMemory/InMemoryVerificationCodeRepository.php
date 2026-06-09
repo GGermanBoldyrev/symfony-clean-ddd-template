@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-// tests/Unit/Identity/Infrastructure/InMemory/InMemoryVerificationCodeRepository.php
-
 namespace App\Tests\Unit\Identity\Infrastructure\InMemory;
 
 use App\Identity\Domain\Entity\VerificationCode;
@@ -26,13 +24,7 @@ final class InMemoryVerificationCodeRepository implements VerificationCodeReposi
 
     public function findByEmail(Email $email): ?VerificationCode
     {
-        foreach ($this->storage as $code) {
-            if ($code->email->equals($email)) {
-                return $code;
-            }
-        }
-
-        return null;
+        return array_find($this->storage, static fn ($code) => $code->email->equals($email));
     }
 
     public function upsert(VerificationCode $code): void
@@ -61,15 +53,16 @@ final class InMemoryVerificationCodeRepository implements VerificationCodeReposi
         ++$this->deleteCount;
     }
 
-    public function deleteExpired(): void
+    public function deleteExpired(): int
     {
         foreach ($this->storage as $key => $code) {
             if ($code->isExpired()) {
                 unset($this->storage[$key]);
+                ++$this->deleteExpiredCount;
             }
         }
 
-        ++$this->deleteExpiredCount;
+        return $this->deleteExpiredCount();
     }
 
     public function count(): int

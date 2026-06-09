@@ -7,7 +7,6 @@ namespace App\Identity\Application\Command\ResendVerificationCode;
 use App\Identity\Application\Port\VerificationCodeGeneratorPort;
 use App\Identity\Application\Port\VerificationMailerPort;
 use App\Identity\Domain\Entity\VerificationCode;
-use App\Identity\Domain\Exception\User\UserAlreadyVerifiedException;
 use App\Identity\Domain\Repository\UserRepositoryInterface;
 use App\Identity\Domain\Repository\VerificationCodeRepositoryInterface;
 use App\Identity\Domain\Service\VerificationCodePolicy;
@@ -29,24 +28,21 @@ final readonly class ResendVerificationCodeCommandHandler
 
     public function __invoke(ResendVerificationCodeCommand $command): void
     {
+        $now = new DateTimeImmutable();
+
         $email = Email::fromString($command->email);
         $user = $this->users->findByEmail($email);
 
-        if ($user === null) {
+        if ($user === null || $user->isVerified()) {
             return;
-        }
-
-        if ($user->isVerified()) {
-            throw new UserAlreadyVerifiedException($email);
         }
 
         $existing = $this->codes->findByEmail($email);
 
-        if ($existing !== null) {
-            $existing->assertCanResend();
+        if ($existing !== null && !$existing->resendAfter->isAllowed($now)) {
+            return;
         }
 
-        $now = new DateTimeImmutable();
         $expiresAt = VerificationCodePolicy::expiresAt($now);
         $code = $this->codeGenerator->generate();
 

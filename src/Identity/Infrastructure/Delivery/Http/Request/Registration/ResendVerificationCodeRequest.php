@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Identity\Infrastructure\Delivery\Http\Request\Auth;
+namespace App\Identity\Infrastructure\Delivery\Http\Request\Registration;
 
 use App\Shared\Infrastructure\Delivery\Http\Request\JsonRequestParser;
 use Symfony\Component\HttpFoundation\Request;

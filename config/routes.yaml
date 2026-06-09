@@ -1,5 +1,5 @@
-controllers:
+identity_controllers:
     resource:
-        path: '../src/Controller/'
-        namespace: 'App\Controller'
+        path: '../src/Identity/Infrastructure/Delivery/Http/Controller/'
+        namespace: 'App\Identity\Infrastructure\Delivery\Http\Controller'
     type: attribute

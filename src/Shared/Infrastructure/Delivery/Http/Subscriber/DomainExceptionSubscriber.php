@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Shared\Infrastructure\Delivery\Http\Subscriber;
 
-use App\Identity\Domain\Exception\User\UserAlreadyVerifiedException;
 use App\Identity\Domain\Exception\User\UserNotFoundException;
 use App\Identity\Domain\Exception\VerificationCode\MaxAttemptsExceededException;
 use App\Identity\Domain\Exception\VerificationCode\ResendCooldownException;
@@ -39,14 +38,11 @@ final class DomainExceptionSubscriber
             $exception instanceof UserNotFoundException,
             $exception instanceof VerificationCodeNotFoundException => HttpErrorCode::NOT_FOUND,
 
-            // Conflict — resource already exists / already in desired state
-            $exception instanceof UserAlreadyVerifiedException => HttpErrorCode::CONFLICT,
-
             // Too many requests - rate limiters
             $exception instanceof MaxAttemptsExceededException,
             $exception instanceof ResendCooldownException => HttpErrorCode::TOO_MANY_REQUESTS,
 
-            // Validation and logic exceptions
+            // All other domain validation / logic exceptions
             default => HttpErrorCode::UNPROCESSABLE_ENTITY,
         };
 

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Controller\Auth;
+namespace App\Identity\Infrastructure\Delivery\Http\Controller\Registration;
 
 use App\Identity\Application\Command\Register\RegisterCommand;
-use App\Identity\Infrastructure\Delivery\Http\Request\Auth\RegisterRequest;
+use App\Identity\Infrastructure\Delivery\Http\Request\Registration\RegisterRequest;
 use App\Shared\Infrastructure\Delivery\Http\Response\ApiResponse;
 use App\Shared\Infrastructure\Delivery\Http\Response\Enum\HttpSuccessCode;
 use Symfony\Component\HttpFoundation\Request;
